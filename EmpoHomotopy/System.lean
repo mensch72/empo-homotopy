@@ -41,15 +41,17 @@ variable (D : SysData S A H G)
 /-- `U(s) := Ψ s (Ve(·,·,s))`. -/
 def U (Ve : H → G → S → ℝ) (s : S) : ℝ := D.Ψ s fun h g => Ve h g s
 
-/-- **Solution** of the abstract system (STATEMENTS.md §0): for all `s, a`,
-`π(s) ∈ Δ(A)`, `Q(s,a) < 0`, `π(s)(a) = (−Q(s,a))^(−β) / ∑_b (−Q(s,b))^(−β)`, `Ve ∈ adm`,
-`Ve = Φ π Ve`,
-`U(s) < 0`, `Vr(s) = U(s) + ∑_a π(s)(a) Q(s,a)`, `Q(s,a) = γ_r ∑_{s'} K(s,a,s') Vr(s')`. -/
+/-- A state `s` is **terminal** iff `K(s,a,s') = 0` for all `a, s'`. -/
+def terminal (s : S) : Prop := ∀ a s', D.K s a s' = 0
+
+/-- **Solution** of the abstract system (STATEMENTS.md §0): for non-terminal `s`,
+`Q(s,a) < 0` and `π(s)(a) = (−Q(s,a))^(−β) / ∑_b (−Q(s,b))^(−β)`; for terminal `s`,
+`π(s)(a) = 1/|A|`; and at all states `Ve ∈ adm`, `Ve = Φ π Ve`, `U(s) < 0`,
+`Vr(s) = U(s) + ∑_a π(s)(a) Q(s,a)`, `Q(s,a) = γ_r ∑_{s'} K(s,a,s') Vr(s')`. -/
 structure IsSolution (π Q : S → A → ℝ) (Ve : H → G → S → ℝ) (Vr : S → ℝ) : Prop where
-  pi_nonneg : ∀ s a, 0 ≤ π s a
-  pi_sum : ∀ s, ∑ a, π s a = 1
-  Q_neg : ∀ s a, Q s a < 0
-  pi_eq : ∀ s a, π s a = (-Q s a) ^ (-D.β) / ∑ b, (-Q s b) ^ (-D.β)
+  Q_neg : ∀ s, ¬ D.terminal s → ∀ a, Q s a < 0
+  pi_eq : ∀ s, ¬ D.terminal s → ∀ a, π s a = (-Q s a) ^ (-D.β) / ∑ b, (-Q s b) ^ (-D.β)
+  pi_terminal : ∀ s, D.terminal s → ∀ a, π s a = 1 / (Fintype.card A : ℝ)
   Ve_mem : Ve ∈ D.adm
   Ve_eq : Ve = D.Φ π Ve
   U_neg : ∀ s, D.U Ve s < 0
@@ -68,91 +70,160 @@ def LocalEval (ρ : S → ℕ) : Prop :=
   ∀ (π π' : S → A → ℝ) (v v' : H → G → S → ℝ) (h : H) (g : G) (s : S), π s = π' s →
     (∀ h' g' s', ρ s' < ρ s → v h' g' s' = v' h' g' s') → D.Φ π v h g s = D.Φ π' v' h g s
 
+open Classical in
+/-- Auxiliary: continuation costs `c̃(s') = c(s')/2` at terminal, `c(s')` at non-terminal `s'`. -/
+def ctilde (c : S → ℝ) (s : S) : ℝ := if D.terminal s then c s / 2 else c s
+
+open Classical in
+/-- Auxiliary: `x(s,a) = −Q(s,a)` at non-terminal `s`, `c(s)/2` at terminal `s`. -/
+def xext (c : S → ℝ) (Q : S → A → ℝ) (p : S × A) : ℝ :=
+  if D.terminal p.1 then c p.1 / 2 else -Q p.1 p.2
+
+open Classical in
+/-- Auxiliary constant term of the extended Bellman equation. -/
+def cext (c : S → ℝ) (p : S × A) : ℝ :=
+  if D.terminal p.1 then c p.1 / 2 else D.γr * ∑ s', D.K p.1 p.2 s' * D.ctilde c s'
+
 end SysData
 
-omit [Fintype S] in
-/-- `∑_a π_a q_a = −w_β(−q)` for `π ∝ (−q)^(−β)`, `q < 0`. -/
-lemma sum_pi_mul_Q {β : ℝ} {π Q : S → A → ℝ} (hQ : ∀ s a, Q s a < 0)
-    (hπ : ∀ s a, π s a = (-Q s a) ^ (-β) / ∑ b, (-Q s b) ^ (-β)) (s : S) :
-    ∑ a, π s a * Q s a = -lehmer β (fun a => -Q s a) := by
-  have h : ∀ a, π s a * Q s a = -((-Q s a) ^ (1 - β)) / ∑ b, (-Q s b) ^ (-β) := by
+/-- `∑_a p_a q_a = −w_β(−q)` for `p ∝ (−q)^(−β)`, `q < 0`. -/
+lemma sum_mul_eq_neg_lehmer {β : ℝ} {p q : A → ℝ} (hq : ∀ a, q a < 0)
+    (hp : ∀ a, p a = (-q a) ^ (-β) / ∑ b, (-q b) ^ (-β)) :
+    ∑ a, p a * q a = -lehmer β (fun a => -q a) := by
+  have h : ∀ a, p a * q a = -((-q a) ^ (1 - β)) / ∑ b, (-q b) ^ (-β) := by
     intro a
-    rw [hπ, rpow_one_sub_eq (neg_pos.2 (hQ s a))]
+    rw [hp, rpow_one_sub_eq (neg_pos.2 (hq a))]
     ring
   rw [Finset.sum_congr rfl fun a _ => h a, ← Finset.sum_div, Finset.sum_neg_distrib, lehmer,
     neg_div]
+
+lemma lehmer_const [Nonempty A] (β : ℝ) {t : ℝ} (ht : 0 < t) : lehmer β (fun _ : A => t) = t :=
+  le_antisymm (lehmer_le_of_le β (fun _ => ht) fun _ => le_rfl)
+    (le_lehmer_of_le β (fun _ => ht) fun _ => le_rfl)
 
 namespace SysData
 
 variable {D : SysData S A H G} {π Q : S → A → ℝ} {Ve : H → G → S → ℝ} {Vr : S → ℝ}
 
-/-- With `x = −Q`, `c = −U`: `x(s,a) = γ_r ∑_{s'} K(s,a,s') (c(s') + w_β(x(s',·)))`. -/
-lemma IsSolution.bellman (hs : D.IsSolution π Q Ve Vr) (s : S) (a : A) :
-    -Q s a = D.γr * ∑ s', D.K s a s' * (-D.U Ve s' + lehmer D.β (fun b => -Q s' b)) := by
-  have hV : ∀ s', Vr s' = -(-D.U Ve s' + lehmer D.β (fun b => -Q s' b)) := by
-    intro s'
-    rw [hs.Vr_eq, sum_pi_mul_Q hs.Q_neg hs.pi_eq]
-    ring
+lemma IsSolution.pi_nonneg (hs : D.IsSolution π Q Ve Vr) (s : S) (a : A) : 0 ≤ π s a := by
+  by_cases ht : D.terminal s
+  · rw [hs.pi_terminal s ht a]; positivity
+  · rw [hs.pi_eq s ht a]
+    exact div_nonneg (Real.rpow_nonneg (neg_pos.2 (hs.Q_neg s ht a)).le _)
+      (Finset.sum_nonneg fun b _ => Real.rpow_nonneg (neg_pos.2 (hs.Q_neg s ht b)).le _)
+
+lemma IsSolution.pi_sum [Nonempty A] (hs : D.IsSolution π Q Ve Vr) (s : S) :
+    ∑ a, π s a = 1 := by
+  by_cases ht : D.terminal s
+  · rw [Finset.sum_congr rfl fun a _ => hs.pi_terminal s ht a, Finset.sum_const,
+      Finset.card_univ, nsmul_eq_mul]
+    have : (0 : ℝ) < Fintype.card A := by exact_mod_cast Fintype.card_pos
+    field_simp
+  · rw [Finset.sum_congr rfl fun a _ => hs.pi_eq s ht a, ← Finset.sum_div]
+    exact div_self (lehmer_denom_pos D.β fun a => neg_pos.2 (hs.Q_neg s ht a)).ne'
+
+lemma IsSolution.Q_terminal (hs : D.IsSolution π Q Ve Vr) {s : S} (ht : D.terminal s) (a : A) :
+    Q s a = 0 := by
   rw [hs.Q_eq]
-  simp only [hV, mul_neg, Finset.sum_neg_distrib, neg_neg]
+  simp [ht a]
+
+lemma IsSolution.Vr_terminal (hs : D.IsSolution π Q Ve Vr) {s : S} (ht : D.terminal s) :
+    Vr s = D.U Ve s := by
+  rw [hs.Vr_eq]
+  simp [hs.Q_terminal ht]
+
+lemma IsSolution.Vr_nonterminal (hs : D.IsSolution π Q Ve Vr) {s : S} (ht : ¬ D.terminal s) :
+    Vr s = D.U Ve s - lehmer D.β (fun b => -Q s b) := by
+  rw [hs.Vr_eq, sum_mul_eq_neg_lehmer (hs.Q_neg s ht) (hs.pi_eq s ht)]
+  ring
+
+lemma IsSolution.Vr_neg [Nonempty A] (hs : D.IsSolution π Q Ve Vr) (s : S) : Vr s < 0 := by
+  by_cases ht : D.terminal s
+  · rw [hs.Vr_terminal ht]; exact hs.U_neg s
+  · rw [hs.Vr_nonterminal ht]
+    have := le_lehmer_of_le D.β (fun b => neg_pos.2 (hs.Q_neg s ht b))
+      fun b => (neg_pos.2 (hs.Q_neg s ht b)).le
+    linarith [hs.U_neg s]
+
+/-- Extended Bellman equation on `S × A`: with `c = −U`,
+`xext = cext + γ_r · M(xext)`, `M` the Lehmer–kernel operator. -/
+lemma IsSolution.ext_eq [Nonempty A] (hs : D.IsSolution π Q Ve Vr) :
+    D.xext (fun s => -D.U Ve s) Q = D.cext (fun s => -D.U Ve s) +
+      D.γr • lehmerBellmanOp D.β (fun p s' => D.K p.1 p.2 s') (D.xext (fun s => -D.U Ve s) Q) := by
+  funext ⟨s, a⟩
+  simp only [xext, cext, Pi.add_apply, Pi.smul_apply, smul_eq_mul, lehmerBellmanOp]
+  by_cases ht : D.terminal s
+  · simp only [ite_eq_left ht]
+    rw [Finset.sum_eq_zero (fun s' _ => by rw [ht a s', zero_mul]), mul_zero, add_zero]
+  · simp only [ite_eq_right ht]
+    rw [hs.Q_eq, ← mul_add, ← Finset.sum_add_distrib, ← mul_neg, ← Finset.sum_neg_distrib]
+    congr 1
+    refine Finset.sum_congr rfl fun s' _ => ?_
+    by_cases ht' : D.terminal s'
+    · simp only [ctilde, ite_eq_left ht']
+      rw [hs.Vr_terminal ht', lehmer_const _ (by linarith [hs.U_neg s'])]
+      ring
+    · simp only [ctilde, ite_eq_right ht']
+      rw [hs.Vr_nonterminal ht']
+      ring
+
+lemma IsSolution.xext_pos (hs : D.IsSolution π Q Ve Vr) (p : S × A) :
+    0 < D.xext (fun s => -D.U Ve s) Q p := by
+  unfold xext
+  split_ifs with ht
+  · linarith [hs.U_neg p.1]
+  · exact neg_pos.2 (hs.Q_neg p.1 ht p.2)
+
+/-- At a non-terminal state every action has positive mass to some successor. -/
+lemma IsSolution.exists_K_pos (hs : D.IsSolution π Q Ve Vr) {s : S} (ht : ¬ D.terminal s)
+    (a : A) : ∃ s', 0 < D.K s a s' := by
+  by_contra hne
+  have h0 : ∀ s', D.K s a s' = 0 := fun s' =>
+    le_antisymm (not_lt.mp fun h => hne ⟨s', h⟩) (D.K_nonneg s a s')
+  have := hs.Q_neg s ht a
+  rw [hs.Q_eq] at this
+  simp [h0] at this
 
 /-- Robot side of SYS-1: same `U` and `β ∈ [0,1]` give the same `Q`. -/
 lemma sys1_Q [Nonempty A] (hβ0 : 0 ≤ D.β) (hβ1 : D.β ≤ 1)
     {π₁ Q₁ π₂ Q₂ : S → A → ℝ} {Ve₁ Ve₂ : H → G → S → ℝ} {Vr₁ Vr₂ : S → ℝ}
     (h₁ : D.IsSolution π₁ Q₁ Ve₁ Vr₁) (h₂ : D.IsSolution π₂ Q₂ Ve₂ Vr₂)
     (hU : D.U Ve₁ = D.U Ve₂) : Q₁ = Q₂ := by
-  rcases isEmpty_or_nonempty S with hS | ⟨⟨s₀⟩⟩
-  · funext s; exact (IsEmpty.false s).elim
+  by_cases hN : ∀ s, D.terminal s
+  · funext s a
+    rw [h₁.Q_terminal (hN s), h₂.Q_terminal (hN s)]
+  obtain ⟨s₀, hs₀⟩ := not_forall.mp hN
   obtain ⟨a₀⟩ := ‹Nonempty A›
-  have hc : ∀ s, 0 < -D.U Ve₁ s := fun s => neg_pos.2 (h₁.U_neg s)
-  have e₁ := h₁.bellman
-  have e₂ := h₂.bellman
-  rw [← hU] at e₂
-  have hw : ∀ s', 0 ≤ lehmer D.β (fun b => -Q₁ s' b) := fun s' =>
-    le_lehmer_of_le D.β (fun b => neg_pos.2 (h₁.Q_neg s' b)) fun b => (neg_pos.2 (h₁.Q_neg s' b)).le
-  have hT : ∀ s a, 0 ≤ ∑ s', D.K s a s' * (-D.U Ve₁ s' + lehmer D.β (fun b => -Q₁ s' b)) :=
-    fun s a => Finset.sum_nonneg fun s' _ =>
-      mul_nonneg (D.K_nonneg s a s') (add_pos_of_pos_of_nonneg (hc s') (hw s')).le
   have hγ : 0 < D.γr := by
     by_contra hne
     replace hne : D.γr ≤ 0 := not_lt.mp hne
-    have h1 := e₁ s₀ a₀
-    have h2 := h₁.Q_neg s₀ a₀
-    have h3 := mul_nonpos_of_nonpos_of_nonneg hne (hT s₀ a₀)
-    linarith
-  -- the constant term `c'(s,a) = γ_r ∑ K(s,a,s') c(s')` is positive
-  set c' : S × A → ℝ := fun p => D.γr * ∑ s', D.K p.1 p.2 s' * (-D.U Ve₁ s') with hc'_def
-  have hc' : ∀ p, 0 < c' p := by
+    have h1 := h₁.Q_neg s₀ hs₀ a₀
+    rw [h₁.Q_eq] at h1
+    have h2 : ∑ s', D.K s₀ a₀ s' * Vr₁ s' ≤ 0 := Finset.sum_nonpos fun s' _ =>
+      mul_nonpos_of_nonneg_of_nonpos (D.K_nonneg _ _ _) (h₁.Vr_neg s').le
+    linarith [mul_nonneg_of_nonpos_of_nonpos hne h2]
+  have hc' : ∀ p, 0 < D.cext (fun s => -D.U Ve₁ s) p := by
     rintro ⟨s, a⟩
-    have hne : ∑ s', D.K s a s' * (-D.U Ve₁ s' + lehmer D.β (fun b => -Q₁ s' b)) ≠ 0 := by
-      intro h0
-      have := e₁ s a
-      rw [h0, mul_zero] at this
-      linarith [h₁.Q_neg s a]
-    obtain ⟨s', -, hs'⟩ := Finset.exists_ne_zero_of_sum_ne_zero hne
-    have hK : 0 < D.K s a s' :=
-      lt_of_le_of_ne (D.K_nonneg s a s') fun h => hs' (by rw [← h, zero_mul])
-    exact mul_pos hγ (Finset.sum_pos' (fun i _ => mul_nonneg (D.K_nonneg s a i) (hc i).le)
-      ⟨s', mem_univ _, mul_pos hK (hc s')⟩)
+    unfold cext
+    split_ifs with ht
+    · linarith [h₁.U_neg s]
+    · obtain ⟨s', hs'⟩ := h₁.exists_K_pos ht a
+      refine mul_pos hγ (Finset.sum_pos' (fun i _ => mul_nonneg (D.K_nonneg _ _ _) ?_)
+        ⟨s', mem_univ _, mul_pos hs' ?_⟩)
+      · unfold ctilde; split_ifs <;> linarith [h₁.U_neg i]
+      · unfold ctilde; split_ifs <;> linarith [h₁.U_neg s']
   obtain ⟨hmono, hhom, -⟩ := lehmerBellmanOp_hyps hβ0 hβ1 (T := fun p s' => D.K p.1 p.2 s')
     (fun p s' => D.K_nonneg _ _ _)
-  have hfix : ∀ {Q : S → A → ℝ},
-      (∀ s a, -Q s a = D.γr * ∑ s', D.K s a s' * (-D.U Ve₁ s' + lehmer D.β (fun b => -Q s' b))) →
-      (fun p : S × A => -Q p.1 p.2) =
-        c' + D.γr • lehmerBellmanOp D.β (fun p s' => D.K p.1 p.2 s') (fun p => -Q p.1 p.2) := by
-    intro Q e
-    funext p
-    simp only [hc'_def, Pi.add_apply, Pi.smul_apply, smul_eq_mul, lehmerBellmanOp]
-    rw [e, ← mul_add, ← Finset.sum_add_distrib]
-    congr 1
-    exact Finset.sum_congr rfl fun s' _ => by ring
-  have key := bel1 hc' hγ.le hmono hhom (x := fun p => -Q₁ p.1 p.2) (y := fun p => -Q₂ p.1 p.2)
-    (fun p => neg_pos.2 (h₁.Q_neg p.1 p.2)) (fun p => neg_pos.2 (h₂.Q_neg p.1 p.2))
-    (hfix e₁) (hfix e₂)
+  have e₂ := h₂.ext_eq
+  have hx₂ := h₂.xext_pos
+  rw [← hU] at e₂ hx₂
+  have key := bel1 hc' hγ.le hmono hhom h₁.xext_pos hx₂ h₁.ext_eq e₂
   funext s a
-  have := congrFun key (s, a)
-  simp only [neg_inj] at this
-  exact this
+  by_cases ht : D.terminal s
+  · rw [h₁.Q_terminal ht, h₂.Q_terminal ht]
+  · have := congrFun key (s, a)
+    simp only [xext, ite_eq_right ht, neg_inj] at this
+    exact this
 
 /-- SYS-1 core with the conclusion on `π` and `Vr`. -/
 lemma sys1_robot [Nonempty A] (hβ0 : 0 ≤ D.β) (hβ1 : D.β ≤ 1)
@@ -162,7 +233,9 @@ lemma sys1_robot [Nonempty A] (hβ0 : 0 ≤ D.β) (hβ1 : D.β ≤ 1)
   have hQ : Q₁ = Q₂ := sys1_Q hβ0 hβ1 h₁ h₂ hU
   have hπ : π₁ = π₂ := by
     funext s a
-    rw [h₁.pi_eq, h₂.pi_eq, hQ]
+    by_cases ht : D.terminal s
+    · rw [h₁.pi_terminal s ht, h₂.pi_terminal s ht]
+    · rw [h₁.pi_eq s ht, h₂.pi_eq s ht, hQ]
   refine ⟨hQ, hπ, ?_⟩
   funext s
   rw [h₁.Vr_eq, h₂.Vr_eq, hU, hπ, hQ]
@@ -175,7 +248,8 @@ open SysData
 If `(π₁,Q₁,Ve₁,Vr₁)` and `(π₂,Q₂,Ve₂,Vr₂)` are solutions of the abstract system with the same
 `U` (i.e. `Ψ s (Ve₁(·,·,s)) = Ψ s (Ve₂(·,·,s))` for all `s`), then `Q₁ = Q₂`, `π₁ = π₂`,
 `Vr₁ = Vr₂`; if moreover `Φ` has UniqEval, then also `Ve₁ = Ve₂`.
-No sign or size condition on `γ_r` is needed (`Q < 0` forces `γ_r > 0` when `S` is nonempty). -/
+No sign or size condition on `γ_r` is needed (a solution with a non-terminal state forces
+`γ_r > 0`). -/
 theorem sys1 [Nonempty A] (D : SysData S A H G) (hβ0 : 0 ≤ D.β) (hβ1 : D.β ≤ 1)
     {π₁ Q₁ π₂ Q₂ : S → A → ℝ} {Ve₁ Ve₂ : H → G → S → ℝ} {Vr₁ Vr₂ : S → ℝ}
     (h₁ : D.IsSolution π₁ Q₁ Ve₁ Vr₁) (h₂ : D.IsSolution π₂ Q₂ Ve₂ Vr₂)
@@ -188,16 +262,17 @@ theorem sys1 [Nonempty A] (D : SysData S A H G) (hβ0 : 0 ≤ D.β) (hβ1 : D.β
   exact hE π₁ h₁.pi_nonneg h₁.pi_sum Ve₁ Ve₂ h₁.Ve_mem h₂.Ve_mem h₁.Ve_eq h₂'
 
 /-- **SYS-2 (`β = 0`).**  Let `A` be nonempty, `β = 0`, and let `Φ` have UniqEval.  Then the
-abstract system has at most one solution `(π, Q, Ve, Vr)`.
-(No hypothesis on `γ_r` is needed; STATEMENTS.md assumes `γ_r ∈ [0,1)`.) -/
+abstract system has at most one solution `(π, Q, Ve, Vr)` (no hypothesis on `γ_r`). -/
 theorem sys2 [Nonempty A] (D : SysData S A H G) (hβ : D.β = 0) (hE : D.UniqEval)
     {π₁ Q₁ π₂ Q₂ : S → A → ℝ} {Ve₁ Ve₂ : H → G → S → ℝ} {Vr₁ Vr₂ : S → ℝ}
     (h₁ : D.IsSolution π₁ Q₁ Ve₁ Vr₁) (h₂ : D.IsSolution π₂ Q₂ Ve₂ Vr₂) :
     π₁ = π₂ ∧ Q₁ = Q₂ ∧ Ve₁ = Ve₂ ∧ Vr₁ = Vr₂ := by
   have hπ : π₁ = π₂ := by
     funext s a
-    rw [h₁.pi_eq, h₂.pi_eq, hβ]
-    simp
+    by_cases ht : D.terminal s
+    · rw [h₁.pi_terminal s ht, h₂.pi_terminal s ht]
+    · rw [h₁.pi_eq s ht, h₂.pi_eq s ht, hβ]
+      simp
   have h₂' := h₂.Ve_eq
   rw [← hπ] at h₂'
   have hVe : Ve₁ = Ve₂ := hE π₁ h₁.pi_nonneg h₁.pi_sum Ve₁ Ve₂ h₁.Ve_mem h₂.Ve_mem h₁.Ve_eq h₂'
@@ -233,8 +308,10 @@ theorem sys3 (D : SysData S A H G) (ρ : S → ℕ) (hρ : ∀ s a s', 0 < D.K s
       · rw [(low s' (hρ s a s' hpos)).2.2.2]
     have hπ : π₁ s = π₂ s := by
       funext a
-      rw [h₁.pi_eq s a, h₂.pi_eq s a]
-      simp only [hQ]
+      by_cases ht : D.terminal s
+      · rw [h₁.pi_terminal s ht, h₂.pi_terminal s ht]
+      · rw [h₁.pi_eq s ht a, h₂.pi_eq s ht a]
+        simp only [hQ]
     have hVe : ∀ h g, Ve₁ h g s = Ve₂ h g s := by
       intro h g
       rw [h₁.Ve_eq, h₂.Ve_eq]
