@@ -1,0 +1,30 @@
+SYNTHETIC (beta_max = a beta with >=3 roots for multi instances; 200 for unique-root controls)
+ multi-root, beta_max inside multi-root window: n=150  arclength ok=1.00  arc steps/corr its/u-evals median=7/22/540  frac with beta-turn=0.03
+   warm nt K=10: converged 1.00  same-branch-as-arclength 0.99  median its 22
+   warm fp K=10: converged 0.99  same-branch-as-arclength 0.99  median its 314
+   warm nt K=40: converged 1.00  same-branch-as-arclength 0.99  median its 80
+   warm fp K=40: converged 0.99  same-branch-as-arclength 0.99  median its 1157
+   warm nt K=160: converged 1.00  same-branch-as-arclength 0.99  median its 320
+   warm fp K=160: converged 0.99  same-branch-as-arclength 0.99  median its 4252
+ multi-root instances, beta_max=200 (past folds): n=150  arclength ok=1.00  arc steps/corr its/u-evals median=20/74/5250  frac with beta-turn=0.63
+   warm nt K=10: converged 0.92  same-branch-as-arclength 0.92  median its 24
+   warm fp K=10: converged 1.00  same-branch-as-arclength 1.00  median its 288
+   warm nt K=40: converged 0.76  same-branch-as-arclength 0.76  median its 80
+   warm fp K=40: converged 1.00  same-branch-as-arclength 1.00  median its 1052
+   warm nt K=160: converged 0.54  same-branch-as-arclength 0.54  median its 319
+   warm fp K=160: converged 1.00  same-branch-as-arclength 1.00  median its 3863
+ unique-root controls, beta_max=200: n=100  arclength ok=0.99  arc steps/corr its/u-evals median=7/24/532  frac with beta-turn=0.03
+   warm nt K=10: converged 1.00  same-branch-as-arclength 0.99  median its 20
+   warm fp K=10: converged 0.98  same-branch-as-arclength 0.97  median its 200
+   warm nt K=40: converged 1.00  same-branch-as-arclength 0.99  median its 78
+   warm fp K=40: converged 0.98  same-branch-as-arclength 0.97  median its 740
+   warm nt K=160: converged 1.00  same-branch-as-arclength 0.99  median its 265
+   warm fp K=160: converged 0.98  same-branch-as-arclength 0.97  median its 2670
+BUS model default (nS reachable solves=101), beta_max=50.0: arclength failures=0, beta-turns=0, warm failures=0
+ max rel diff warm-vs-arclength x = 1.01e-10; states with >1 root at beta_max: 0/101; max #roots 1
+BUS sweep: states with >=2 / >=3 roots at beta in {5,20,100,500} over configs (warm-chain downstream)
+ local problems=12928, with >=2 roots=0, with >=3 roots=0; first >=3 example (seed,kw,beta)=None
+
+real	1m35.969s
+user	1m35.746s
+sys	0m0.080s

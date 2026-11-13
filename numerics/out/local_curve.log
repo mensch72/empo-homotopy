@@ -1,0 +1,13 @@
+general search N=20000: 623 instances with >=3 solutions
+ |A|=2 |H|=1 try=3229 beta=2 nroots=3 xi=3.765 eta=3.338
+ v=[[0.327, 0.96]] d=[2.299, 0.0]
+ |A|=2 |H|=1 try=7759 beta=2 nroots=3 xi=4.805 eta=1.596
+ v=[[0.797, 0.065]] d=[0.0, 5.729]
+ |A|=2 |H|=1 try=11420 beta=2 nroots=3 xi=4.930 eta=2.465
+ v=[[0.119, 0.954]] d=[12.88, 3.827]
+|A|=2,|H|=1 search N=20000: 865 hits
+LOC-4 check: {'rig': 0, 'tight': 0} 3666 0.0005467146431524686 612.8513604124585 (violations by constants, #tested, median beta*, min over multi-root instances of beta_first_multi/beta*_tight; must be >=1)
+
+real	0m23.106s
+user	0m23.631s
+sys	0m0.107s
