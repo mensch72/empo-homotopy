@@ -1,0 +1,4 @@
+/home/user/empo-homotopy/numerics/cyclic/search.py:48: RuntimeWarning: invalid value encountered in subtract
+  db = (resid(g, y[:-1], y[-1] * bs + h) - R) / h * bs
+/home/user/empo-homotopy/numerics/cyclic/search.py:48: RuntimeWarning: invalid value encountered in subtract
+  db = (resid(g, y[:-1], y[-1] * bs + h) - R) / h * bs
