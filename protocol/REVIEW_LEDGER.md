@@ -62,7 +62,7 @@ Keep the manifest's own hash in an external record if needed; do not create a se
 
 | ID | Date | Affected | Finding | Status |
 | --- | --- | --- | --- | --- |
-| F1 | 2026-11-13 | STATEMENTS §0 (R2), LOC-1..4, §4 | Proposal Table 1 eq. (2) puts U_r(s) at the current state; arXiv:2508.00159v2 eqs. 4/9 give Q_r(s,a) = γ_r E[U_r(s') + E Q_r(s',a')]. Under the paper's form the local problem (LOC) is vacuous and acyclic games are uniquely solvable. LEH and BEL unaffected. | Open: owner decision on target system; source to be re-read by a second reader |
+| F1 | 2026-11-13 | STATEMENTS §0 (R2), LOC-1..4, §4 | Proposal Table 1 eq. (2) puts U_r(s) at the current state; arXiv:2508.00159v2 eqs. 4/9 give Q_r(s,a) = γ_r E[U_r(s') + E Q_r(s',a')]. Under the paper's form the local problem (LOC) is vacuous and acyclic games are uniquely solvable. LEH and BEL unaffected. | Resolved 2026-11-13: owner chose the paper's version; equations re-read from the arXiv LaTeX source by the integrator; STATEMENTS §0 rewritten, LOC and old §4 demoted to the proposal's variant |
 | F2 | 2026-11-13 | STATEMENTS §0 | Numerics agent: eq. (2) needs a goal-marginal human policy for E_{a_H}; terminal V_h unspecified. | Open: owner to specify |
 | F3 | 2026-11-13 | LOC-4, BEL-1/2, LOC-2, LEH-1 | Statement audit: STATEMENTS.md imprecise (m > 0 needed in LOC-4; unused hypotheses). | Resolved: STATEMENTS.md aligned with the Lean roots |
 

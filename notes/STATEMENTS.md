@@ -3,36 +3,46 @@
 Status marks: **L** = proved in Lean (name given), **I** = informal proof only, **N** = numerical
 evidence only, **?** = open.  Nothing marked I/N/? may be reported as verified.
 
-## 0. System as read from the proposal (Table 1)
+## 0. Target system (owner decision 2026-11-13: the paper's version)
 
-Finite sets S (states), A_r (robot actions), H (humans), G (goals); transitions T(s'|s,a).
-Unknown: robot policy π_r(s) ∈ Δ(A_r).  Exogenous: human policies π_h(s,g), π⁰_{-h}(s), rewards U_h ≥ 0.
+Source: arXiv:2508.00159v2, Table 2 (`tab:equations`), eqs. (4)–(9), read from the LaTeX source.
+Phase 1 (human side, eqs. (1)–(3)) yields π_h independently of π_r; it is treated as exogenous here.
 
-    (1) π_r(s)(a) ∝ (−Q_r(s,a))^(−β),                                   β ≥ 0
-    (2) Q_r(s,a) = U_r(s) + γ_r E_{a_H} E_{s'} E_{a'∼π_r(s')} Q_r(s',a') < 0
-    (3) U_r(s)   = −(1/ξ) (E_h 2^(−ξ P_h(s)))^η
-    (4) P_h(s)   = log2 E_g V_h(s,g)^ζ
-    (5) V_h(s,g) = E_{a_h∼π_h(s,g)} ( E_{a_-h} ( E_{a_r∼π_r(s)} (E_{s'} X)^κ )^(θ/κ) )^(1/θ),
-        X = U_h(s',g) + γ_h V_h(s',g)
+    (4) Q_r(s,a)    = γ_r E_g E_{a_H∼π_H(s,g)} E_{s'} V_r(s')
+    (5) π_r(s)(a)   ∝ (−Q_r(s,a))^(−β_r)
+    (6) V^e_h(s,g_h) = E_{g_-h} E_{a_H∼π_H(s,g)} E_{a_r∼π_r(s)} E_{s'} (U_h(s',g_h) + γ_h V^e_h(s',g_h))
+    (7) X_h(s)      = Σ_{g_h} V^e_h(s,g_h)^ζ
+    (8) U_r(s)      = −(Σ_h X_h(s)^(−ξ))^η
+    (9) V_r(s)      = U_r(s) + E_{a_r∼π_r(s)} Q_r(s,a_r)
 
-Reading R1 (bracketing of (5)) and R2 (the first term of (2) is U_r(s), at the *current* state,
-hence independent of a) are taken from the PDF as printed; both are flagged for the owner.
-**Finding F1 (2026-11-13, from arXiv:2508.00159v2 Table 1, eqs. 4, 5, 9; read by a fetch agent,
-not yet re-read by a second reader).**  The paper has Q_r(s,a) = γ_r E_{s'} V_r(s'),
-V_r(s) = U_r(s) + E_{a∼π_r(s)} Q_r(s,a), i.e. Q_r(s,a) = γ_r E_{s'}[U_r(s') + E_{a'}Q_r(s',a')]
-(reading R2').  Under R2' the term U_r(s) does not enter π_r(s), acyclic games have a unique
-solution by plain backward induction (as the paper states), and §1 and §4 below are vacuous;
-they matter only under R2 (the proposal as printed).  §2 and §3 hold under both readings
-(under R2': c = γ_r T̄(−U_r) > 0 needs γ_r > 0 and is the same equation x = c + γ M(x)).
-The paper's (6)–(8) also have no κ, θ and no log (U_r = −(Σ_h X_h^(−ξ))^η, X_h = Σ_g V^ζ).
-Owner to decide which system is the target.
+Abstract form used for all statements (finite S, A nonempty, H, G; real parameters):
+kernels K(s,a,s') ≥ 0 and Kh(h,g,s,a,s') ≥ 0 with row sums ≤ 1 (the human and goal expectations
+are folded into the kernels), rewards r(h,g,s,a) ≥ 0 (= E_{s'} U_h(s',g)).  A **solution** is
+(π, Q, Ve, Vr) with, for all s, a, h, g:
 
-Standing assumption P: V_h(s,g) > 0 wherever it enters (4) (else U_r = −∞).
+    π(s) ∈ Δ(A),  Q(s,a) < 0,  π(s)(a) = (−Q(s,a))^(−β) / Σ_b (−Q(s,b))^(−β)
+    Ve(h,g,s) = Σ_a π(s)(a) [ r(h,g,s,a) + γ_h Σ_{s'} Kh(h,g,s,a,s') Ve(h,g,s') ],  Ve ≥ 0
+    X(h,s) := Σ_g Ve(h,g,s)^ζ > 0,   U(s) := −(Σ_h X(h,s)^(−ξ))^η
+    Vr(s) = U(s) + Σ_a π(s)(a) Q(s,a),   Q(s,a) = γ_r Σ_{s'} K(s,a,s') Vr(s')
 
-Consequence of R2: Q_r(s,·) depends on a only through the continuation term, while U_r(s) depends
-on π_r(s) itself through (5).  Write x = −U_r(s) > 0 and d_a = −γ_r E[...Q_r(s',a')] ≥ 0.
+Simplifications relative to the paper: state-independent action set and one goal set G for all
+humans; H nonempty.  The proposal's Table 1 differs (U_r(s) inside Q_r(s,a); extra exponents κ, θ):
+§1 and §4 below concern that variant only and are **not** about the target system (finding F1).
 
-## 1. Local problem (one state, continuation costs d given)
+With x = −Q, c = −U > 0:  x(s,a) = γ_r Σ_{s'} K(s,a,s') [ c(s') + w_β(x(s',·)) ]  (w_β: §2),
+i.e. x = c' + γ_r M(x) as in §3 with c' = γ_r K c.
+
+- **SYS-1 (robot side determined by U for β ≤ 1).** Let β ∈ [0,1].  Two solutions with the same
+  U have the same Q, π and Vr.  If moreover γ_h ∈ [0,1), they have the same Ve.
+- **SYS-2 (β = 0).** If β = 0 and γ_h, γ_r ∈ [0,1), there is at most one solution.
+- **SYS-3 (acyclic).** If there is ρ : S → ℕ with ρ(s') < ρ(s) whenever K(s,a,s') > 0 or
+  Kh(h,g,s,a,s') > 0, there is at most one solution, for all real β, γ_r, γ_h, ζ, ξ, η.
+- **SYS-4 (?)** Existence of a solution (needs positivity conditions on the data; paper: ε-regularisation).
+- **SYS-5 (?)** Is the solution unique in cyclic games for β ≤ 1?  For which β can it be non-unique?
+- Remark (**I**): π_r is invariant under scaling Q_r, so γ_r → 0 is not trivial: with x̃ = x/γ_r,
+  x̃ = K(c + γ_r w_β(x̃)); at γ_r = 0, π_r(s) ∝ (Σ_{s'}K(s,a,s') c(s'))^(−β) still feeds back through c.
+
+## 1. Local problem (proposal's variant only; one state, continuation costs d given)
 
 All **L** items: Lean names in `EmpoHomotopy/`, non-author statement audit passed 2026-11-13
 (`protocol/REVIEW_LEDGER.md`).
@@ -71,7 +81,7 @@ For x ∈ (0,∞)^A:  w_β(x) := Σ_a x_a^(1−β) / Σ_a x_a^(−β)  ( = −E_
 
 Data: finite Ω (= S×A_r), c : Ω → (0,∞), γ ≥ 0, M : (0,∞)^Ω → ℝ^Ω monotone and
 positively homogeneous of degree 1.  Equation: x = c + γ M(x), x ∈ (0,∞)^Ω.
-Instance: c(s,a) = −U_r(s), M(x)(s,a) = Σ_{s'} T̄(s'|s,a) w_β(x(s',·)), β ∈ [0,1]
+Instance (proposal's variant; for the target system see §0): c(s,a) = −U_r(s), M(x)(s,a) = Σ_{s'} T̄(s'|s,a) w_β(x(s',·)), β ∈ [0,1]
 (hypotheses of BEL-1 for this instance: **L** `lehmerBellmanOp_hyps`; those of BEL-2: **I**).
 
 - **BEL-1 (uniqueness).** [**L** `bel1`] The equation has at most one solution, for every γ ≥ 0.
@@ -83,7 +93,7 @@ Instance: c(s,a) = −U_r(s), M(x)(s,a) = Σ_{s'} T̄(s'|s,a) w_β(x(s',·)), β
   the full system reduces to a fixed-point problem U = 𝒰(U) in |S| unknowns.  All
   non-uniqueness for β ≤ 1 comes from the human-side feedback (3)–(5); for β > 1 also from LEH-3.
 
-## 4. Acyclic (finite-horizon) games  — **I**
+## 4. Acyclic games in the proposal's variant  — **I**
 
 Backward induction over states: at each s the downstream solution fixes d and the map u (from
 (3)–(5), continuous under P), so LOC-2 gives existence of a solution of (1)–(5) for all β without
