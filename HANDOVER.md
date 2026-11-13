@@ -34,3 +34,5 @@ Nothing.
 - 11-13 later: cyclic numerics done (SYS-N); two-state non-uniqueness instance found, re-derived by
   hand and checked in exact rational arithmetic (SYS-6); Lean proof started.
 - 11-13 later: SYS-6 proved in Lean (three solutions) and audited.
+- 11-13 later: owner: (7T) gets a discount γ_h; acyclicity only as an optional extra condition.
+  Existence for small γ_h recorded as SYS-TE (informal).

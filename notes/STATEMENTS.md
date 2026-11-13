@@ -20,10 +20,11 @@ Phase 1 (human policies π_h) is exogenous.
 
 Alternative to (6')+(7) (owner, 2026-11-13; "trajectory goals", no goal dimension, X_h = 2^{P_h}):
 
-    (7T) X_h(s) = 1 + Σ_{s'} max_{a_h} P(s'|s,a_h,π_-h,π_r)^ζ X_h(s')
+    (7T) X_h(s) = 1 + γ_h Σ_{s'} max_{a_h} P(s'|s,a_h,π_-h,π_r)^ζ X_h(s')     (discount: owner, 2026-11-13)
 
-Note: (7T) has no discount; M_π(s,s') = max_{a_h} P(s'|s,a_h,π_-h,π_r(s))^ζ can have row sums > 1
-(up to min(|A_h|,|S|)), so in cyclic games a finite X exists iff the spectral radius of M_π is < 1.
+With M_π(s,s') = max_{a_h} P(s'|s,a_h,π_-h,π_r(s))^ζ ≥ 0: X = 1 + γ_h M_π X.  Row sums of M_π are
+≤ m := min(|A_h|, |S|) for ζ ≥ 1 (each entry ≤ 1; and p^ζ ≤ p), and can exceed 1.  Acyclicity is an
+optional extra condition (then M_π is nilpotent and X exists for every γ_h).
 
 Bracketing of (6') is reading R1 of the PDF (owner has not objected).
 
@@ -68,6 +69,13 @@ audit passed 2026-11-13 (after the F4 rework).
   M_π ≥ 0 arbitrary: UniqEval holds, with no row-sum or discount hypothesis (BEL-1 with c = 1, γ = 1).
   So for (7T), SYS-1 and SYS-2 hold without row-sum/discount hypotheses (still β ∈ [0,1] resp. β = 0,
   A nonempty) — **I**: this composition, the concrete M_π = max_{a_h} P^ζ and `trajΨ` have no Lean theorem yet.
+- **SYS-TE (I; existence for (7T) with small discount).** If γ_h m < 1 then for every π there is exactly
+  one X, and 1 ≤ X ≤ 1/(1 − γ_h m) (Neumann series, ‖γ_h M_π‖_∞ < 1).  Hence U lies in a compact
+  subinterval of (−∞, 0) independent of π; if moreover γ_r ∈ (0,1) and every action of a non-terminal
+  state has positive successor mass, then π ↦ power law of Q(π) is a continuous self-map of Δ(A)^S and
+  a solution of the full system exists for every β (Brouwer; would be a listed published-theorem
+  assumption in Lean unless Mathlib provides it).  γ_h m < 1 is sufficient, not necessary: what is
+  needed is spectral radius of γ_h M_π < 1 for all π.
 - **SYS-P (?)** UniqEval for the power-mean Φ of (6') in cyclic games with κ, θ < 1.  (Power means of
   order < 1 are not sup-norm nonexpansive; rewards may vanish, so BEL-1 does not apply directly.)
 - **SYS-6 (non-uniqueness in a cyclic game).** [**L** `sys6_two_solutions`, `sys6_three_solutions`,
