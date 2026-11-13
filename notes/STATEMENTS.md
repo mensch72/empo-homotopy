@@ -37,12 +37,12 @@ A **solution** is (π, Q, Ve, Vr) with, for all s, a:
     Vr(s) = U(s) + Σ_a π(s)(a) Q(s,a),   Q(s,a) = γ_r Σ_{s'} K(s,a,s') Vr(s')
 
 s is **terminal** iff K(s,a,s') = 0 for all a, s'.  (Finding F4: without the terminal case no
-solution exists in an acyclic game, since Q = 0 at a minimal-rank state.)  A solution forces
+solution exists in an acyclic game, since Q = 0 at a minimal-rank state.)  A solution forces (if A is nonempty and some state is non-terminal)
 γ_r > 0 and Σ_{s'} K(s,a,s') > 0 for every action of a non-terminal state.
 
 UniqEval(Φ): for every π there is at most one Ve ∈ D with Ve = Φ π Ve (π ranging over families of distributions).
 Local(Φ, ρ): (Φ π v)(h,g,s) depends on π only through π(s) and on v only through states of rank < ρ(s).
-Instances: linear Φ (paper's (6)) with Ψ from (7)–(8) and D ⊆ {Ve > 0}; trajectory Φ (7T) with
+Instances: linear Φ (paper's (6)) with Ψ from (7)–(8) (meaningful for Ve > 0; the SYS-L theorems hold for any D); trajectory Φ (7T) with
 Ψ_s(w) = −(Σ_h w_h^(−ξ))^η and D = {v > 0}; power-mean Φ ((6'), later batch).
 Simplifications: state-independent action set, one goal set for all humans.
 §1 and §4 below concern the proposal's variant of eq. (2) (U_r(s) inside Q_r(s,a)) and are **not**
@@ -51,18 +51,23 @@ about the target system (finding F1).
 With x = −Q, c = −U > 0:  x(s,a) = γ_r Σ_{s'} K(s,a,s') [ c(s') + w_β(x(s',·)) ]  (w_β: §2),
 i.e. x = c' + γ_r M(x) as in §3 with c' = γ_r K c.
 
-- **SYS-1 (robot side determined by U for β ≤ 1).** Let β ∈ [0,1].  Two solutions with the same
+All **L** items of this section: `EmpoHomotopy/System.lean` at commit d2dda7a, non-author statement
+audit passed 2026-11-13 (after the F4 rework).
+
+- **SYS-1 (robot side determined by U for β ≤ 1).** [**L** `sys1`] Let β ∈ [0,1].  Two solutions with the same
   U have the same Q, π and Vr; under UniqEval(Φ) also the same Ve.
-- **SYS-2 (β = 0).** If β = 0 and UniqEval(Φ), there is at most one solution.
-- **SYS-3 (acyclic).** If ρ : S → ℕ satisfies ρ(s') < ρ(s) whenever K(s,a,s') > 0, and Local(Φ, ρ),
+- **SYS-2 (β = 0).** [**L** `sys2`] If β = 0 and UniqEval(Φ), there is at most one solution.
+- **SYS-3 (acyclic).** [**L** `sys3`] If ρ : S → ℕ satisfies ρ(s') < ρ(s) whenever K(s,a,s') > 0, and Local(Φ, ρ),
   there is at most one solution, for all real β, γ_r.
-- **SYS-W (non-vacuity).** There is an acyclic instance with a terminal state (two states) satisfying
+- **SYS-W (non-vacuity).** [**L** `sys3_nonvacuous`, `sys1_nonvacuous`; trivial exponents ζ=ξ=η=1,
+  action-independent kernels] There is an acyclic instance with a terminal state (two states) satisfying
   the hypotheses of SYS-3 that has a solution; likewise a cyclic one-state instance for SYS-1/2.
-- **SYS-L (linear instance).** Φ π v h g s = Σ_a π(s)(a)[r(h,g,s,a) + γ_h Σ_{s'} Kh(h,g,s,a,s') v(h,g,s')]
+- **SYS-L (linear instance).** [**L** `sys_linear_uniqEval`, `sys_linear_local`] Φ π v h g s = Σ_a π(s)(a)[r(h,g,s,a) + γ_h Σ_{s'} Kh(h,g,s,a,s') v(h,g,s')]
   with Kh ≥ 0, row sums ≤ 1: UniqEval if γ_h ∈ [0,1); Local(Φ, ρ) if Kh respects ρ.
-- **SYS-T (trajectory instance).** G = {*}, D = {v > 0}, Φ π v h s = 1 + Σ_{s'} M_π(h,s,s') v(h,s') with
+- **SYS-T (trajectory instance).** [**L** `sys_T_uniqEval`] G = {*}, D = {v > 0}, Φ π v h s = 1 + Σ_{s'} M_π(h,s,s') v(h,s') with
   M_π ≥ 0 arbitrary: UniqEval holds, with no row-sum or discount hypothesis (BEL-1 with c = 1, γ = 1).
-  So for (7T), SYS-1 and SYS-2 hold unconditionally.
+  So for (7T), SYS-1 and SYS-2 hold without row-sum/discount hypotheses (still β ∈ [0,1] resp. β = 0,
+  A nonempty) — **I**: this composition, the concrete M_π = max_{a_h} P^ζ and `trajΨ` have no Lean theorem yet.
 - **SYS-P (?)** UniqEval for the power-mean Φ of (6') in cyclic games with κ, θ < 1.  (Power means of
   order < 1 are not sup-norm nonexpansive; rewards may vanish, so BEL-1 does not apply directly.)
 - **SYS-4 (?)** Existence of a solution (positivity conditions on the data; paper: ε-regularisation).
