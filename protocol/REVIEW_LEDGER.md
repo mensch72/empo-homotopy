@@ -66,6 +66,7 @@ Keep the manifest's own hash in an external record if needed; do not create a se
 | F2 | 2026-11-13 | STATEMENTS §0 | Numerics agent: eq. (2) needs a goal-marginal human policy for E_{a_H}; terminal V_h unspecified. | Open: owner to specify |
 | F3 | 2026-11-13 | LOC-4, BEL-1/2, LOC-2, LEH-1 | Statement audit: STATEMENTS.md imprecise (m > 0 needed in LOC-4; unused hypotheses). | Resolved: STATEMENTS.md aligned with the Lean roots |
 | F4 | 2026-11-13 | STATEMENTS §0 abstract form, `sys3` (commit 4068309) | Statement audit: with Q < 0 required at all states, no solution exists under the acyclicity hypothesis, so `sys3` is vacuous (reviewer proved ¬IsSolution in a scratch file). `sys1`, `sys2`, SYS-L, SYS-T faithful. | Resolved: terminal states added (commit d2dda7a), `sys1`–`sys3` re-proved, witnesses `sys3_nonvacuous`, `sys1_nonvacuous`; fresh non-author audit passed |
+| F5 | 2026-11-14 | STATEMENTS §0, modelling of terminal states | Solver agent: with rewards on transitions, V_h = 0 at a terminal state, so X_h = 0 and U_r = −∞ there (linear and power-mean forms); the abstract Lean system avoids this only because Φ, Ψ are arbitrary. The paper requires goal sets wide enough that W_h > −∞. Not an issue for (7T), where X ≥ 1. | Open: owner to say how U_r is defined at terminal states |
 
 ## Formal roots (project entries, release candidate 0.1)
 

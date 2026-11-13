@@ -15,14 +15,12 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
   target), LEH-1..3, BEL-1, BEL-2; SYS-1..3, SYS-W, SYS-L, SYS-T at commit d2dda7a (after F4 rework,
   re-audited); SYS-6 (three solutions of a cyclic two-state game at β = 2) at c4556d0, audited; TRJ-1..3 (trajectory form: existence/uniqueness/bounds per matrix, row sums,
   sys1/sys2 corollaries) at 44feb87, audited.
+- Solver: `solver/empo_solver/` (README there; `python3 -m pytest solver/tests`, 14 tests pass).
 - Numerics: `numerics/REPORT.md` (proposal's variant); `numerics/cyclic/` (target system) in progress.
 - Not a completed Protocol E release (no clean-checkout review, manifest, manuscript).
 
 ## In flight when this was written
-1. Solver agent (restarted after a container restart): Python package `solver/empo_solver/` (backward
-   induction, finite-horizon unrolling, arclength continuation in β / γ_r / γ_h, multistart,
-   diagnostics; tests incl. the SYS-6 instance; `solver/README.md`).  Pushes after each step.
-   If lost: continue from the pushed files; spec = this list + STATEMENTS §0.
+Nothing.
 
 ## Next (in order)
 - Power-mean Φ instance in Lean (definition, locality); SYS-P (is V_h unique given π_r for κ, θ < 1?).
@@ -43,3 +41,4 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
 - 11-13/14: container restart killed two agents; files survived. Trajectory.lean finished by the
   integrator (one simp step repaired), built, audited. Brouwer not found in Mathlib (word search).
   Lesson: trust only `lake build`, not a silent single-file check under `timeout`.
+- 11-14: solver package finished (commit d36a30c); selection table on SYS-6 recorded (SYS-S); F5 opened.

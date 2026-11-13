@@ -97,6 +97,11 @@ audit passed 2026-11-13 (after the F4 rework).
   trajectory form (7T): 53 of 168, one instance with 3 solutions for β ≈ 0.95–1.2.  Warm-start Newton
   stalls at folds, arclength passes them; tracing in γ_r from ≈ 0 reached a different solution
   (near-deterministic) than tracing in β from 0 (near-uniform) on the simplest instance.
+- **SYS-S (N; solver, `solver/README.md`).** On the SYS-6 instance the three solutions at β = 2 lie on
+  one connected curve from β = 0 (folds at β ≈ 2.586 and β ≈ 1.139).  Selection: β-continuation from 0
+  (first crossing) → p ≈ 0.546; γ_r-continuation from ≈ 0 → p ≈ 1; finite-horizon unrolling → p ≈ 1
+  (T = 147); multistart → all three.  On 72 random cyclic games (β = 1.5, 4) all methods agreed on one
+  solution.
 - **SYS-4 (?)** Existence of a solution (positivity conditions on the data; paper: ε-regularisation).
 - **SYS-5 (?)** Is the solution unique in cyclic games for β ≤ 1 with linear or power-mean V_h?
   (Not for (7T), per SYS-N.)
