@@ -175,4 +175,26 @@ theorem sys6_two_solutions : ∃ (π₁ Q₁ : Fin 2 → Fin 3 → ℝ) (Ve₁ :
   rw [h] at hp₁
   linarith [hp₁.2, hp₂.1]
 
+/-- **SYS-6, three solutions.**  For the instance of `sys6_two_solutions` there are three
+solutions with pairwise distinct policies; the third has `π(1)(2) ∈ [1 − 10⁻¹⁵, 1 − 10⁻¹⁶]`. -/
+theorem sys6_three_solutions : ∃ (π₁ Q₁ : Fin 2 → Fin 3 → ℝ) (Ve₁ : Unit → Unit → Fin 2 → ℝ)
+    (Vr₁ : Fin 2 → ℝ) (π₂ Q₂ : Fin 2 → Fin 3 → ℝ) (Ve₂ : Unit → Unit → Fin 2 → ℝ)
+    (Vr₂ : Fin 2 → ℝ) (π₃ Q₃ : Fin 2 → Fin 3 → ℝ) (Ve₃ : Unit → Unit → Fin 2 → ℝ)
+    (Vr₃ : Fin 2 → ℝ), NonUnique.D.IsSolution π₁ Q₁ Ve₁ Vr₁ ∧
+      NonUnique.D.IsSolution π₂ Q₂ Ve₂ Vr₂ ∧ NonUnique.D.IsSolution π₃ Q₃ Ve₃ Vr₃ ∧
+      π₁ ≠ π₂ ∧ π₁ ≠ π₃ ∧ π₂ ≠ π₃ := by
+  obtain ⟨π₁, Q₁, Ve₁, Vr₁, h₁, hp₁⟩ :=
+    solution_in (a := 1 / 2) (b := 3 / 5) (by norm_num) (by norm_num) (by norm_num)
+      (by norm_num [G])
+  obtain ⟨π₂, Q₂, Ve₂, Vr₂, h₂, hp₂⟩ :=
+    solution_in (a := 19 / 20) (b := 99 / 100) (by norm_num) (by norm_num) (by norm_num)
+      (by norm_num [G])
+  obtain ⟨π₃, Q₃, Ve₃, Vr₃, h₃, hp₃⟩ :=
+    solution_in (a := 1 - 1 / 10 ^ 15) (b := 1 - 1 / 10 ^ 16) (by norm_num) (by norm_num)
+      (by norm_num) (by norm_num [G])
+  refine ⟨π₁, Q₁, Ve₁, Vr₁, π₂, Q₂, Ve₂, Vr₂, π₃, Q₃, Ve₃, Vr₃, h₁, h₂, h₃, ?_, ?_, ?_⟩
+  · intro h; rw [h] at hp₁; linarith [hp₁.2, hp₂.1]
+  · intro h; rw [h] at hp₁; norm_num at hp₁ hp₃; linarith [hp₁.2, hp₃.1]
+  · intro h; rw [h] at hp₂; norm_num at hp₂ hp₃; linarith [hp₂.2, hp₃.1]
+
 end EmpoHomotopy
