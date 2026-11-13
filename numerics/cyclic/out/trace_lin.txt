@@ -1,0 +1,13 @@
+instance i=168 (mode lin) dims S,A,H,G=(2, 3, 1, 1), first multiplicity grid beta=2.0, plotted coordinate pi(s1)(a2)
+nsol per beta {'0': 1, '0.5': 1, '1': 1, '2': 3, '3': 1, '5': 1, '8': 1, '12': 1, '20': 1, '35': 1, '50': 1}
+folds of principal branch [2.8953300055211884, 1.1433930593406543]
+sol beta=2.0: x=[784971.656452, 784971.656452, 784971.656452, 784971.656452, 784971.656452, 547265.708128] pi(s1,a2)=0.507069 maxQ=-5.5e+05 minVe=0.14 minX=0.046 simplex=0 Qres=1.1e-14 pires=0 vefp=8.3e-16
+sol beta=2.0: x=[784971.656452, 784971.656452, 784971.656452, 784971.656452, 784971.656452, 0.00603] pi(s1,a2)=1 maxQ=-0.006 minVe=0.14 minX=0.046 simplex=0 Qres=4.4e-16 pires=1.1e-16 vefp=8.9e-16
+sol beta=2.0: x=[784971.656452, 784971.656452, 784971.656452, 784971.656452, 784971.656452, 99279.909734] pi(s1,a2)=0.969 maxQ=-9.9e+04 minVe=0.14 minX=0.046 simplex=1.1e-16 Qres=7.4e-15 pires=0 vefp=8.9e-16
+pairwise max|z-z'| = [18.324, 1.707, 16.617]
+warm beta-steps K=10: converged 3/10 steps, last ok beta=2.48
+warm beta-steps K=80: converged 28/80 steps, last ok beta=2.89
+gamma_r=0.02, beta=2.0: multistart finds 1 solution(s)
+gamma_r arclength (folds [], reached gamma_r=0.865), Newton polish at target: res 3.3e-16, sol index 1 of 3 (pi=1); all pi: [np.float64(0.5071), np.float64(1.0), np.float64(0.969)]
+gamma_r warm K=10: reached target=True, sol index 1 (pi=1)
+gamma_r warm K=80: reached target=True, sol index 1 (pi=1)

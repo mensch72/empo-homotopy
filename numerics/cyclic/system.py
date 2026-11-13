@@ -168,5 +168,5 @@ def verify(g, z, beta):
         if res < 1e-15: break
     X = (Ve ** g.zeta).sum(1); U = -((X ** -g.xi).sum(0)) ** g.eta
     Vr = U + (pi * Q).sum(1); Q2 = g.gr * g.K @ Vr
-    return dict(maxQ=Q.max(), minVe=Ve.min(), minX=X.min(), simplex=abs(pi.sum(1) - 1).max(), Qres=np.abs(Q - Q2).max() / np.abs(Q).max(),
+    return dict(maxQ=Q.max(), minVe=Ve.min(), minX=X.min(), simplex=abs(pi.sum(1) - 1).max(), Qres=(np.abs(Q - Q2) / np.abs(Q)).max(),
                 pires=np.abs(pi - softmax_pi(g, z, beta).reshape(S, A)).max(), vefp=res)

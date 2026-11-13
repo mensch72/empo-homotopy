@@ -1,5 +1,6 @@
 """Multi-start multiplicity search + pseudo-arclength continuation.  usage: python3 search.py {lin|nonlin} N seed budget_s"""
 import sys, json, time, numpy as np
+from dataclasses import replace
 from multiprocessing import Pool
 from system import *
 from system import _F
@@ -38,16 +39,19 @@ def find(g, beta, rng, prev):
     return sols
 
 
-def trace(g, bmax=50.0, maxsteps=600, bs=10.0):
-    """pseudo-arclength in (z, beta/bs) from the beta=0 solution; returns (betas, zs, fold list)."""
+def trace(g, pend=50.0, mode='beta', p0=0.0, beta0=0.0, maxsteps=600, ps=10.0):
+    """pseudo-arclength in (z, p/ps) with p = beta (mode 'beta') or gamma_r at fixed beta0 (mode 'gr'),
+    from a Newton solution at p0 upward until p > pend.  Returns (p path, z path, fold p-values)."""
     n = g.dims[0] * g.dims[1]
-    z, nr = newton(g, uniform_start(g, 0), 0.0)
-    y = np.append(z, 0.0); tprev = np.zeros(n + 1); tprev[-1] = 1
+    gg = lambda p: g if mode == 'beta' else replace(g, gr=p)
+    bb = lambda p: p if mode == 'beta' else beta0
+    z = find(gg(p0), bb(p0), np.random.default_rng(0), [])[0]   # unique at beta=0 / tiny gamma_r (checked by multistart)
+    y = np.append(z, p0 / ps); tprev = np.zeros(n + 1); tprev[-1] = 1
     def Jfull(y):
-        R, J = resid(g, y[:-1], y[-1] * bs, True); h = 1e-6
-        db = (resid(g, y[:-1], y[-1] * bs + h) - R) / h * bs
+        p = y[-1] * ps; R, J = resid(gg(p), y[:-1], bb(p), True); h = 1e-6
+        db = (resid(gg(p + h), y[:-1], bb(p + h)) - R) / h * ps
         return R, np.hstack([J, db[:, None]])
-    ds, B, Z, folds = 0.1, [0.0], [z.copy()], []
+    ds, B, Z, folds = 0.1, [p0], [z.copy()], []
     for _ in range(maxsteps):
         _, Jf = Jfull(y)
         try: t = np.linalg.solve(np.vstack([Jf, tprev]), np.append(np.zeros(n), 1.0))
@@ -66,10 +70,10 @@ def trace(g, bmax=50.0, maxsteps=600, bs=10.0):
             if ok and np.abs(yn - y).max() > 1.5 * ds + 1e-9: ok = False
             if not ok: ds /= 2
         if not ok: break
-        if np.sign(t[-1]) != np.sign(tprev[-1]) and t[-1] * tprev[-1] != 0 and len(B) > 1: folds.append(float(y[-1] * bs))
-        tprev = t; y = yn; B.append(y[-1] * bs); Z.append(y[:-1].copy())
+        if t[-1] * tprev[-1] < 0 and len(B) > 1: folds.append(float(y[-1] * ps))
+        tprev = t; y = yn; B.append(y[-1] * ps); Z.append(y[:-1].copy())
         ds = min(ds * 1.5, 1.0) if it <= 3 else ds
-        if y[-1] * bs > bmax: break
+        if y[-1] * ps > pend: break
     return np.array(B), np.array(Z), folds
 
 
