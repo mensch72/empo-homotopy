@@ -18,7 +18,14 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
 - Not a completed Protocol E release (no clean-checkout review, manifest, manuscript).
 
 ## In flight when this was written
-Nothing.
+Owner (11-13): main objective = something that helps solving these systems; choice of next steps left to the agent.
+1. Solver agent: Python package `solver/empo_solver/` (backward induction, finite-horizon unrolling,
+   arclength continuation in β / γ_r / γ_h, multistart, diagnostics; tests incl. the SYS-6 instance;
+   `solver/README.md`).  If lost: spec = this list + STATEMENTS §0; reuse `numerics/cyclic/system.py`.
+2. Lean author agent: `EmpoHomotopy/Trajectory.lean` — TRJ-1 (X = 1 + γ M X has exactly one solution,
+   1 ≤ X ≤ 1/(1−γm), if row sums ≤ m and γm < 1), TRJ-2 (row sums of max_{a_h} P^ζ ≤ |A_h|), TRJ-3
+   (sys1/sys2 for the trajectory form without evaluation hypothesis), TRJ-4 (is Brouwer in Mathlib?).
+3. Afterwards: non-author statement audit of Trajectory.lean; update STATEMENTS marks and ledger.
 
 ## Next (in order)
 - Power-mean Φ instance in Lean (definition, locality); SYS-P (is V_h unique given π_r for κ, θ < 1?).
