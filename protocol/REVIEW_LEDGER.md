@@ -63,3 +63,24 @@ Keep the manifest's own hash in an external record if needed; do not create a se
 | ID | Date | Affected | Finding | Status |
 | --- | --- | --- | --- | --- |
 | F1 | 2026-11-13 | STATEMENTS §0 (R2), LOC-1..4, §4 | Proposal Table 1 eq. (2) puts U_r(s) at the current state; arXiv:2508.00159v2 eqs. 4/9 give Q_r(s,a) = γ_r E[U_r(s') + E Q_r(s',a')]. Under the paper's form the local problem (LOC) is vacuous and acyclic games are uniquely solvable. LEH and BEL unaffected. | Open: owner decision on target system; source to be re-read by a second reader |
+| F2 | 2026-11-13 | STATEMENTS §0 | Numerics agent: eq. (2) needs a goal-marginal human policy for E_{a_H}; terminal V_h unspecified. | Open: owner to specify |
+| F3 | 2026-11-13 | LOC-4, BEL-1/2, LOC-2, LEH-1 | Statement audit: STATEMENTS.md imprecise (m > 0 needed in LOC-4; unused hypotheses). | Resolved: STATEMENTS.md aligned with the Lean roots |
+
+## Formal roots (project entries, release candidate 0.1)
+
+Lean commit b7ca9f1; axioms of every root: propext, Classical.choice, Quot.sound (`axioms_report.txt`);
+allowed source assumptions: none.  Statement audit: separate agent that wrote no proofs, read
+definition bodies and root statements against STATEMENTS §1–3, did not run Lean; verdict below.
+
+| Unit | Root | Audit |
+| --- | --- | --- |
+| LOC-1 | `EmpoHomotopy.loc1` | faithful |
+| LOC-2 | `loc2` | faithful (holds for all real β) |
+| LOC-3 | `loc3`, `loc3_beta_zero` | faithful |
+| LOC-4 | `loc4` | faithful (0 < m required; "at most one") |
+| LEH-1..3 | `leh1`, `leh2`, `leh3` | faithful |
+| BEL-1 | `bel1`, instance `lehmerBellmanOp_hyps` | faithful |
+| BEL-2 | `bel2` | faithful; Lehmer instance of its hypotheses not formalised |
+
+Not yet done for a Protocol E release: clean-checkout build by a reviewer, release manifest,
+manuscript.  Status: **not a completed Protocol E release.**

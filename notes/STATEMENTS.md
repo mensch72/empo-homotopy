@@ -34,43 +34,51 @@ on π_r(s) itself through (5).  Write x = −U_r(s) > 0 and d_a = −γ_r E[...Q
 
 ## 1. Local problem (one state, continuation costs d given)
 
+All **L** items: Lean names in `EmpoHomotopy/`, non-author statement audit passed 2026-11-13
+(`protocol/REVIEW_LEDGER.md`).
+
 Data: finite nonempty A; d : A → [0,∞); u : Δ(A) → (0,∞) continuous; β ≥ 0.
 σ_β(x)(a) := (x+d_a)^(−β) / Σ_b (x+d_b)^(−β)  for x > 0.
 A *local solution* is π ∈ Δ(A) with π = σ_β(u(π)).
 
-- **LOC-1 (scalar reduction).** π ↦ u(π) is a bijection from local solutions onto
+- **LOC-1 (scalar reduction).** [**L** `loc1`] π ↦ u(π) is a bijection from local solutions onto
   {x > 0 : x = u(σ_β(x))}, with inverse x ↦ σ_β(x).
-- **LOC-2 (existence without Brouwer).** A local solution exists for every β ≥ 0.
+- **LOC-2 (existence without Brouwer).** [**L** `loc2`] A local solution exists for every real β.
   Proof: φ(x) = u(σ_β(x)) is continuous and maps [min u, max u] into itself; IVT.
-- **LOC-3.** If d is constant (in particular if γ_r = 0), then σ_β(x) is uniform for all β, x;
+- **LOC-3.** [**L** `loc3`, `loc3_beta_zero`] If d is constant (in particular if γ_r = 0), then σ_β(x) is uniform for all β, x;
   the local solution is unique and uniform.  Likewise for β = 0.
-- **LOC-4 (uniqueness for small β).** Let m ≤ u ≤ M on Δ(A), u L-Lipschitz w.r.t. ‖·‖₁,
+- **LOC-4 (uniqueness for small β).** [**L** `loc4`] Let 0 < m ≤ u on Δ(A), u L-Lipschitz w.r.t. ‖·‖₁,
   d_min, d_max the extreme values of d, D = d_max − d_min.  If
       β · L · D < 2 (m + d_min)(m + d_max)
-  then the local solution is unique.
+  then there is at most one local solution (exactly one, with LOC-2).
   Proof: dσ_a/dx = β σ_a (r̄ − r_a), r_a = 1/(x+d_a), r̄ = Σ σ_b r_b; so
-  ‖σ'(x)‖₁ = β E_σ|r − r̄| ≤ β (r_max − r_min)/2 = β D / (2 (x+d_min)(x+d_max)); φ is a contraction on [m,M].
+  ‖σ'(x)‖₁ = β E_σ|r − r̄| ≤ β (r_max − r_min)/2 = β D / (2 (x+d_min)(x+d_max)); φ is a contraction on [m,∞).
+  **N**: the bound is very loose (first multiplicity at β ≥ 613 β* in 3666 random instances).
+- **LOC-5 (N, multiplicity exists).** |A| = 2, u(π) = (π·v)^(−ξη)/ξ, v = (0.327, 0.96), d = (2.299, 0),
+  ξ = 3.765, η = 3.338, β = 2: three solutions x ≈ 0.663, 1.729, 51.9 (`numerics/REPORT.md`).
+  Not found in the bus toy model (12928 local problems); none found for β < 1.
 
 ## 2. Lehmer mean (the robot's value aggregation)
 
 For x ∈ (0,∞)^A:  w_β(x) := Σ_a x_a^(1−β) / Σ_a x_a^(−β)  ( = −E_{a∼π}Q with x = −Q, π ∝ x^(−β) ).
 
-- **LEH-1.** min x ≤ w_β(x) ≤ max x;  w_β(λx) = λ w_β(x) for λ > 0.
-- **LEH-2.** For β ∈ [0,1], w_β is monotone (x ≤ y pointwise ⇒ w_β(x) ≤ w_β(y)).
-- **LEH-3.** For β = 2, |A| = 2, w is not monotone: w(3,1) = 6/5 > 110/101 = w(10,1).
+- **LEH-1.** [**L** `leh1`, every real β] min x ≤ w_β(x) ≤ max x;  w_β(λx) = λ w_β(x) for λ > 0.
+- **LEH-2.** [**L** `leh2`] For β ∈ [0,1], w_β is monotone (x ≤ y pointwise ⇒ w_β(x) ≤ w_β(y)).
+- **LEH-3.** [**L** `leh3`] For β = 2, |A| = 2, w is not monotone: w(3,1) = 6/5 > 110/101 = w(10,1).
   (General β > 1: ∂w/∂x₁ < 0 for x₁/x₂ large; **I**.)
 
 ## 3. Robot-side Bellman equation given U (cyclic case allowed)
 
-Data: finite Ω (= S×A_r), c : Ω → (0,∞), γ ≥ 0, M : (0,∞)^Ω → [0,∞)^Ω monotone and
+Data: finite Ω (= S×A_r), c : Ω → (0,∞), γ ≥ 0, M : (0,∞)^Ω → ℝ^Ω monotone and
 positively homogeneous of degree 1.  Equation: x = c + γ M(x), x ∈ (0,∞)^Ω.
-Instance: c(s,a) = −U_r(s), M(x)(s,a) = Σ_{s'} T̄(s'|s,a) w_β(x(s',·)), β ∈ [0,1] (by LEH-1,2).
+Instance: c(s,a) = −U_r(s), M(x)(s,a) = Σ_{s'} T̄(s'|s,a) w_β(x(s',·)), β ∈ [0,1]
+(hypotheses of BEL-1 for this instance: **L** `lehmerBellmanOp_hyps`; those of BEL-2: **I**).
 
-- **BEL-1 (uniqueness).** The equation has at most one solution, for every γ ≥ 0.
+- **BEL-1 (uniqueness).** [**L** `bel1`] The equation has at most one solution, for every γ ≥ 0.
   Proof: for solutions x, y let λ = max_ω x_ω/y_ω.  If λ > 1 then
   x = c + γM(x) ≤ c + γλM(y) = λy − (λ−1)c < λy pointwise, contradicting the choice of λ.
-- **BEL-2 (existence).** If γ < 1 and M(x) ≤ max x (pointwise), M continuous, a solution exists
-  (monotone iteration from x⁰ = c in the box [min c, max c/(1−γ)]).  **I**
+- **BEL-2 (existence).** [**L** `bel2`] If γ < 1, M monotone, M ≥ 0, continuous on (0,∞)^Ω and
+  (x ≤ b pointwise ⇒ M(x) ≤ b) for all b, a solution exists (monotone iteration; homogeneity not needed).
 - Corollary (**I**): for β ≤ 1, γ_r < 1, system (1)–(2) determines (Q_r, π_r) uniquely from U_r;
   the full system reduces to a fixed-point problem U = 𝒰(U) in |S| unknowns.  All
   non-uniqueness for β ≤ 1 comes from the human-side feedback (3)–(5); for β > 1 also from LEH-3.
