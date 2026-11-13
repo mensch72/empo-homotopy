@@ -18,8 +18,8 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
 - Not a completed Protocol E release (no clean-checkout review, manifest, manuscript).
 
 ## In flight when this was written
-1. Numerics agent: `numerics/cyclic/` — search small cyclic games for multiple solutions (linear,
-   power-mean, trajectory variants), tracer comparison, `numerics/cyclic/REPORT.md`.
+1. Lean author agent: SYS-6 (two-state non-uniqueness instance) in `EmpoHomotopy/NonUnique.lean`.
+   Afterwards: non-author statement audit of that file.
 
 ## Next (in order)
 - Power-mean Φ instance in Lean (definition, locality); SYS-P (is V_h unique given π_r for κ, θ < 1?).
@@ -32,3 +32,5 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
   Q_r) → owner chose paper; then pdf eq. (5) for V_h; then (7T) added; abstract system proved;
   audit found F4; rework started.
 - 11-13 later: F4 fixed and re-audited; statements and ledger updated.
+- 11-13 later: cyclic numerics done (SYS-N); two-state non-uniqueness instance found, re-derived by
+  hand and checked in exact rational arithmetic (SYS-6); Lean proof started.
