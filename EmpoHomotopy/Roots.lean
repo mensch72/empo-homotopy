@@ -22,3 +22,4 @@ import EmpoHomotopy.System
 #print axioms EmpoHomotopy.sys_linear_uniqEval
 #print axioms EmpoHomotopy.sys_linear_local
 #print axioms EmpoHomotopy.sys_paper_psi_neg
+#print axioms EmpoHomotopy.sys_T_uniqEval

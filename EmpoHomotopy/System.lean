@@ -17,7 +17,7 @@ noncomputable section
 namespace EmpoHomotopy
 
 /-- Data of the abstract target system: robot kernel `K` (nonnegative, row sums `≤ 1`),
-evaluation operator `Φ`, aggregation `Ψ`, and the real parameters `β`, `γ_r`. -/
+evaluation operator `Φ`, aggregation `Ψ`, admissible set `adm` (= `D` in STATEMENTS.md), and the real parameters `β`, `γ_r`. -/
 structure SysData (S A H G : Type*) [Fintype S] where
   /-- robot transition kernel `K(s,a,s')` (human and goal expectations folded in) -/
   K : S → A → S → ℝ
@@ -27,6 +27,8 @@ structure SysData (S A H G : Type*) [Fintype S] where
   Ψ : S → (H → G → ℝ) → ℝ
   β : ℝ
   γr : ℝ
+  /-- admissible set `D ⊆ ℝ^{H×G×S}` for `Ve` -/
+  adm : Set (H → G → S → ℝ)
   K_nonneg : ∀ s a s', 0 ≤ K s a s'
   K_sum_le : ∀ s a, ∑ s', K s a s' ≤ 1
 
@@ -40,23 +42,25 @@ variable (D : SysData S A H G)
 def U (Ve : H → G → S → ℝ) (s : S) : ℝ := D.Ψ s fun h g => Ve h g s
 
 /-- **Solution** of the abstract system (STATEMENTS.md §0): for all `s, a`,
-`π(s) ∈ Δ(A)`, `Q(s,a) < 0`, `π(s)(a) = (−Q(s,a))^(−β) / ∑_b (−Q(s,b))^(−β)`, `Ve = Φ π Ve`,
+`π(s) ∈ Δ(A)`, `Q(s,a) < 0`, `π(s)(a) = (−Q(s,a))^(−β) / ∑_b (−Q(s,b))^(−β)`, `Ve ∈ adm`,
+`Ve = Φ π Ve`,
 `U(s) < 0`, `Vr(s) = U(s) + ∑_a π(s)(a) Q(s,a)`, `Q(s,a) = γ_r ∑_{s'} K(s,a,s') Vr(s')`. -/
 structure IsSolution (π Q : S → A → ℝ) (Ve : H → G → S → ℝ) (Vr : S → ℝ) : Prop where
   pi_nonneg : ∀ s a, 0 ≤ π s a
   pi_sum : ∀ s, ∑ a, π s a = 1
   Q_neg : ∀ s a, Q s a < 0
   pi_eq : ∀ s a, π s a = (-Q s a) ^ (-D.β) / ∑ b, (-Q s b) ^ (-D.β)
+  Ve_mem : Ve ∈ D.adm
   Ve_eq : Ve = D.Φ π Ve
   U_neg : ∀ s, D.U Ve s < 0
   Vr_eq : ∀ s, Vr s = D.U Ve s + ∑ a, π s a * Q s a
   Q_eq : ∀ s a, Q s a = D.γr * ∑ s', D.K s a s' * Vr s'
 
 /-- **UniqEval**: for every policy `π` with `π(s) ∈ Δ(A)` for all `s`, there is at most one
-`Ve` with `Ve = Φ π Ve`. -/
+`Ve ∈ adm` with `Ve = Φ π Ve`. -/
 def UniqEval : Prop :=
   ∀ π : S → A → ℝ, (∀ s a, 0 ≤ π s a) → (∀ s, ∑ a, π s a = 1) →
-    ∀ V W : H → G → S → ℝ, V = D.Φ π V → W = D.Φ π W → V = W
+    ∀ V W : H → G → S → ℝ, V ∈ D.adm → W ∈ D.adm → V = D.Φ π V → W = D.Φ π W → V = W
 
 /-- **Locality** of `Φ` w.r.t. a rank `ρ`: `(Φ π v)(h,g,s)` depends on `π` only through `π(s)`
 and on `v` only through the values `v(h',g',s')` with `ρ(s') < ρ(s)`. -/
@@ -181,7 +185,7 @@ theorem sys1 [Nonempty A] (D : SysData S A H G) (hβ0 : 0 ≤ D.β) (hβ1 : D.β
   refine ⟨hQ, hπ, hVr, fun hE => ?_⟩
   have h₂' := h₂.Ve_eq
   rw [← hπ] at h₂'
-  exact hE π₁ h₁.pi_nonneg h₁.pi_sum Ve₁ Ve₂ h₁.Ve_eq h₂'
+  exact hE π₁ h₁.pi_nonneg h₁.pi_sum Ve₁ Ve₂ h₁.Ve_mem h₂.Ve_mem h₁.Ve_eq h₂'
 
 /-- **SYS-2 (`β = 0`).**  Let `A` be nonempty, `β = 0`, and let `Φ` have UniqEval.  Then the
 abstract system has at most one solution `(π, Q, Ve, Vr)`.
@@ -196,7 +200,7 @@ theorem sys2 [Nonempty A] (D : SysData S A H G) (hβ : D.β = 0) (hE : D.UniqEva
     simp
   have h₂' := h₂.Ve_eq
   rw [← hπ] at h₂'
-  have hVe : Ve₁ = Ve₂ := hE π₁ h₁.pi_nonneg h₁.pi_sum Ve₁ Ve₂ h₁.Ve_eq h₂'
+  have hVe : Ve₁ = Ve₂ := hE π₁ h₁.pi_nonneg h₁.pi_sum Ve₁ Ve₂ h₁.Ve_mem h₂.Ve_mem h₁.Ve_eq h₂'
   have hU : D.U Ve₁ = D.U Ve₂ := by rw [hVe]
   obtain ⟨hQ, -, hVr⟩ := sys1_robot (le_of_eq hβ.symm) (by rw [hβ]; norm_num) h₁ h₂ hU
   exact ⟨hπ, hQ, hVe, hVr⟩
@@ -289,12 +293,12 @@ def linearΦ {S A H G : Type*} [Fintype S] [Fintype A] (r : H → G → S → A 
 
 /-- **Instance (a), UniqEval.**  If `γ_h ∈ [0,1)` and `Kh ≥ 0` with row sums `≤ 1`, the linear
 evaluation `linearΦ r γ_h Kh` has UniqEval: for every `π` with `π(s) ∈ Δ(A)` there is at most
-one `v` with `v = linearΦ r γ_h Kh π v` (any real `r`). -/
+one `v` with `v = linearΦ r γ_h Kh π v` (any real `r`; any admissible set, e.g. `univ`). -/
 theorem sys_linear_uniqEval (D : SysData S A H G) {r : H → G → S → A → ℝ} {γh : ℝ}
     {Kh : H → G → S → A → S → ℝ} (hΦ : D.Φ = linearΦ r γh Kh) (hγ0 : 0 ≤ γh) (hγ1 : γh < 1)
     (hKh0 : ∀ h g s a s', 0 ≤ Kh h g s a s') (hKh1 : ∀ h g s a, ∑ s', Kh h g s a s' ≤ 1) :
     D.UniqEval := by
-  intro π hπ0 hπ1 V W hV hW
+  intro π hπ0 hπ1 V W _ _ hV hW
   rw [hΦ] at hV hW
   funext h g s
   have hδ : ∀ s, V h g s - W h g s =
@@ -324,6 +328,43 @@ theorem sys_linear_local (D : SysData S A H G) {r : H → G → S → A → ℝ}
     · rw [← h0, zero_mul, zero_mul]
     · rw [hv h g s' (hρ h g s a s' hpos)]
   simp only [hin]
+
+/-- The trajectory evaluation operator (eq. (7T), abstract form), with goal set `Unit`:
+`(Φ π v)(h,*,s) = 1 + ∑_{s'} M_π(h,s,s') v(h,*,s')`. -/
+def trajΦ {S A H : Type*} [Fintype S] (Mπ : (S → A → ℝ) → H → S → S → ℝ) (π : S → A → ℝ)
+    (v : H → Unit → S → ℝ) : H → Unit → S → ℝ :=
+  fun h g s => 1 + ∑ s', Mπ π h s s' * v h g s'
+
+/-- **SYS-T (trajectory instance).**  Let `G = Unit`, admissible set `{v | v > 0}`, and
+`Φ π v h * s = 1 + ∑_{s'} M_π(h,s,s') v(h,*,s')` with `M_π(h,s,s') ≥ 0` for all `π, h, s, s'`.
+Then UniqEval holds: for every `π` there is at most one positive `v` with `v = Φ π v`
+(no row-sum or discount hypothesis; BEL-1 with `c = 1`, `γ = 1`). -/
+theorem sys_T_uniqEval (D : SysData S A H Unit) {Mπ : (S → A → ℝ) → H → S → S → ℝ}
+    (hM : ∀ π h s s', 0 ≤ Mπ π h s s') (hΦ : D.Φ = trajΦ Mπ)
+    (hadm : D.adm = {v | ∀ h g s, 0 < v h g s}) : D.UniqEval := by
+  intro π _ _ V W hVm hWm hV hW
+  rw [hadm] at hVm hWm
+  funext h g s
+  let M : (S → ℝ) → (S → ℝ) := fun x s => ∑ s', Mπ π h s s' * x s'
+  have hmono : ∀ x y : S → ℝ, (∀ ω, 0 < x ω) → (∀ ω, x ω ≤ y ω) → ∀ ω, M x ω ≤ M y ω :=
+    fun x y _ hxy ω => Finset.sum_le_sum fun s' _ =>
+      mul_le_mul_of_nonneg_left (hxy s') (hM π h ω s')
+  have hhom : ∀ l : ℝ, 0 < l → ∀ x : S → ℝ, (∀ ω, 0 < x ω) → M (l • x) = l • M x := by
+    intro l _ x _
+    funext ω
+    simp only [M, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun s' _ => by ring
+  have hfix : ∀ X : H → Unit → S → ℝ, X = trajΦ Mπ π X →
+      (fun s => X h g s) = 1 + (1 : ℝ) • M (fun s => X h g s) := by
+    intro X hX
+    funext s
+    have := congrFun (congrFun (congrFun hX h) g) s
+    simp only [Pi.add_apply, Pi.one_apply, one_smul, M]
+    exact this
+  rw [hΦ] at hV hW
+  have := bel1 (c := 1) (fun _ => one_pos) zero_le_one hmono hhom (fun s => hVm h g s)
+    (fun s => hWm h g s) (hfix V hV) (hfix W hW)
+  exact congrFun this s
 
 /-- The paper's aggregation (eqs. (7)–(8)):
 `Ψ s w = −(∑_h (∑_g w(h,g)^ζ)^(−ξ))^η`. -/
