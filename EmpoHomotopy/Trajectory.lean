@@ -106,7 +106,9 @@ theorem traj_exists_unique (M : S → S → ℝ) (hM0 : ∀ s s', 0 ≤ M s s') 
   let L : (S → ℝ) →ₗ[ℝ] (S → ℝ) := LinearMap.id - γ • Matrix.mulVecLin M
   have hL : ∀ x s, L x s = x s - γ * ∑ s', M s s' * x s' := by
     intro x s
-    simp [L, Matrix.mulVec, dotProduct]
+    simp only [L, LinearMap.sub_apply, LinearMap.id_coe, id_eq, LinearMap.smul_apply,
+      Matrix.mulVecLin_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+    rfl
   have hinj : Function.Injective L := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro x hx

@@ -20,3 +20,8 @@
 'EmpoHomotopy.sys3_nonvacuous' depends on axioms: [propext, Classical.choice, Quot.sound]
 'EmpoHomotopy.sys6_two_solutions' depends on axioms: [propext, Classical.choice, Quot.sound]
 'EmpoHomotopy.sys6_three_solutions' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EmpoHomotopy.traj_exists_unique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EmpoHomotopy.trajM_rowsum_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EmpoHomotopy.trajM_le_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EmpoHomotopy.sys1_traj' depends on axioms: [propext, Classical.choice, Quot.sound]
+'EmpoHomotopy.sys2_traj' depends on axioms: [propext, Classical.choice, Quot.sound]

@@ -3,6 +3,7 @@ import EmpoHomotopy.Lehmer
 import EmpoHomotopy.Bellman
 import EmpoHomotopy.System
 import EmpoHomotopy.NonUnique
+import EmpoHomotopy.Trajectory
 
 /-! Root theorems of release 0.1 and their axiom dependencies. -/
 
@@ -28,3 +29,8 @@ import EmpoHomotopy.NonUnique
 #print axioms EmpoHomotopy.sys3_nonvacuous
 #print axioms EmpoHomotopy.sys6_two_solutions
 #print axioms EmpoHomotopy.sys6_three_solutions
+#print axioms EmpoHomotopy.traj_exists_unique
+#print axioms EmpoHomotopy.trajM_rowsum_le
+#print axioms EmpoHomotopy.trajM_le_one
+#print axioms EmpoHomotopy.sys1_traj
+#print axioms EmpoHomotopy.sys2_traj
