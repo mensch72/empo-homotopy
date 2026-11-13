@@ -1,0 +1,29 @@
+{
+  "files": {
+    "AGENTS.md": {
+      "bytes": 7783,
+      "sha256": "10d7bbcb9a18cb743e6d2e3b947013e1c4199d28e306fa7ebaa295dd3a7962a2"
+    },
+    "KIT.md": {
+      "bytes": 2204,
+      "sha256": "0b36d7faf20d17b877f8cbb93bef08e667199af3bd50b032aaaedb25c52bac91"
+    },
+    "PROJECT.md": {
+      "bytes": 3656,
+      "sha256": "a05331e006e03e8ade130fa9a5acc93edc752207763f3627488c3cc2dff23f0f"
+    },
+    "PROTOCOL.md": {
+      "bytes": 9111,
+      "sha256": "a6935609c68ae3e899e735fd7dd8e4cac2115c50805d168079ae9842a4d4a3d7"
+    },
+    "REVIEW_LEDGER.md": {
+      "bytes": 3776,
+      "sha256": "2e221e9695806bec85cebff5319fbb9e88ff13a98756c6f5077948aceb223d33"
+    }
+  },
+  "framework": "Protocol_E",
+  "framework_edition": 1,
+  "hash_algorithm": "SHA-256",
+  "schema": 1,
+  "status": "Blank starter kit, not completed research evidence"
+}
