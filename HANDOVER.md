@@ -13,13 +13,12 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
 ## State
 - Lean, audited (non-author statement audit passed): LOC-1..4 (proposal's variant only, not the
   target), LEH-1..3, BEL-1, BEL-2; SYS-1..3, SYS-W, SYS-L, SYS-T at commit d2dda7a (after F4 rework,
-  re-audited).
+  re-audited); SYS-6 (three solutions of a cyclic two-state game at β = 2) at c4556d0, audited.
 - Numerics: `numerics/REPORT.md` (proposal's variant); `numerics/cyclic/` (target system) in progress.
 - Not a completed Protocol E release (no clean-checkout review, manifest, manuscript).
 
 ## In flight when this was written
-1. Lean author agent: SYS-6 (two-state non-uniqueness instance) in `EmpoHomotopy/NonUnique.lean`.
-   Afterwards: non-author statement audit of that file.
+Nothing.
 
 ## Next (in order)
 - Power-mean Φ instance in Lean (definition, locality); SYS-P (is V_h unique given π_r for κ, θ < 1?).
@@ -34,3 +33,4 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
 - 11-13 later: F4 fixed and re-audited; statements and ledger updated.
 - 11-13 later: cyclic numerics done (SYS-N); two-state non-uniqueness instance found, re-derived by
   hand and checked in exact rational arithmetic (SYS-6); Lean proof started.
+- 11-13 later: SYS-6 proved in Lean (three solutions) and audited.

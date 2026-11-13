@@ -87,8 +87,9 @@ definition bodies and root statements against STATEMENTS §1–3, did not run Le
 | SYS-L | `sys_linear_uniqEval`, `sys_linear_local` | faithful |
 | SYS-T | `sys_T_uniqEval` | faithful; concrete M_π and composition with sys1/2 not formalised |
 | Ψ instance | `sys_paper_psi_neg` | faithful; meaningful only for positive arguments |
+| SYS-6 | `sys6_two_solutions`, `sys6_three_solutions` (commit c4556d0) | faithful; instance checked field by field; reviewer's own exact-arithmetic check agrees |
 
-Audits of the SYS roots: reviewers read definitions and statements, ran no Lean; all 20 roots in
+Audits of the SYS roots: reviewers read definitions and statements, ran no Lean; all 22 roots in
 `axioms_report.txt` depend only on propext, Classical.choice, Quot.sound.
 
 Not yet done for a Protocol E release: clean-checkout build by a reviewer, release manifest,

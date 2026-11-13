@@ -70,12 +70,14 @@ audit passed 2026-11-13 (after the F4 rework).
   A nonempty) — **I**: this composition, the concrete M_π = max_{a_h} P^ζ and `trajΨ` have no Lean theorem yet.
 - **SYS-P (?)** UniqEval for the power-mean Φ of (6') in cyclic games with κ, θ < 1.  (Power means of
   order < 1 are not sup-norm nonexpansive; rewards may vanish, so BEL-1 does not apply directly.)
-- **SYS-6 (non-uniqueness in a cyclic game; I, exact rational computation).** S = {0,1}, A = {a0,a1,a2},
+- **SYS-6 (non-uniqueness in a cyclic game).** [**L** `sys6_two_solutions`, `sys6_three_solutions`,
+  `EmpoHomotopy/NonUnique.lean`, commit c4556d0, audited] S = {0,1}, A = {a0,a1,a2},
   one human, one goal, linear Φ, Ψ from (7)–(8); state 0: all actions lead to 0 with reward 1/20;
   state 1: a0, a1 lead to 0 (reward 1/20), a2 leads to 1 (reward 1); γ_h = 2/3, γ_r = 4/5, ζ = 2, ξ = 1,
   η = 3, β = 2.  With p = π(1)(a2), solutions correspond to zeros of a rational function g on (0,1),
-  and g(1/2) < 0 < g(3/5), g(19/20) > 0 > g(99/100), g(1−10⁻¹²) < 0 < g(1−10⁻²⁰): at least three
-  solutions (`numerics/cyclic/two_state_exact.py`).  Lean target: at least two distinct solutions.
+  and g(1/2) < 0 < g(3/5), g(19/20) > 0 > g(99/100), g changes sign on [1−10⁻¹⁵, 1−10⁻¹⁶]: at least three
+  solutions with pairwise distinct π (p ≈ 0.546, 0.954, ≈ 1).  The instance has no terminal state
+  and β = 2 > 1, so SYS-1..3 do not apply.
 - **SYS-N (N; `numerics/cyclic/REPORT.md`).** Random small cyclic games, multi-start + arclength:
   linear V_h: 23 of 229 instances with ≥ 2 solutions, none at β ≤ 1 (smallest fold β ≈ 1.09);
   power-mean V_h: 9 of 74, none at β ≤ 1, V_h iteration always converged to one limit (sampled);
