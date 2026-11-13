@@ -18,17 +18,24 @@ Phase 1 (human policies π_h) is exogenous.
                                                  uniform weights, since π_r is invariant under scaling U_r]
     (9)  V_r(s)     = U_r(s) + E_{a_r∼π_r(s)} Q_r(s,a_r)
 
+Alternative to (6')+(7) (owner, 2026-11-13; "trajectory goals", no goal dimension, X_h = 2^{P_h}):
+
+    (7T) X_h(s) = 1 + Σ_{s'} max_{a_h} P(s'|s,a_h,π_-h,π_r)^ζ X_h(s')
+
+Note: (7T) has no discount; M_π(s,s') = max_{a_h} P(s'|s,a_h,π_-h,π_r(s))^ζ can have row sums > 1
+(up to min(|A_h|,|S|)), so in cyclic games a finite X exists iff the spectral radius of M_π is < 1.
+
 Bracketing of (6') is reading R1 of the PDF (owner has not objected).
 
 **Abstract form** (finite S, A nonempty, H, G; K(s,a,s') ≥ 0 with row sums ≤ 1; real β, γ_r):
-an evaluation operator Φ (π, v) ↦ Φ π v ∈ ℝ^{H×G×S} and an aggregation Ψ_s : ℝ^{H×G} → ℝ.
+an evaluation operator Φ (π, v) ↦ Φ π v ∈ ℝ^{H×G×S} with admissible set D ⊆ ℝ^{H×G×S}, and an aggregation Ψ_s : ℝ^{H×G} → ℝ.
 A **solution** is (π, Q, Ve, Vr) with, for all s, a:
 
     π(s) ∈ Δ(A),  Q(s,a) < 0,  π(s)(a) = (−Q(s,a))^(−β) / Σ_b (−Q(s,b))^(−β)
-    Ve = Φ π Ve,   U(s) := Ψ_s(Ve(·,·,s)) < 0
+    Ve ∈ D,  Ve = Φ π Ve,   U(s) := Ψ_s(Ve(·,·,s)) < 0
     Vr(s) = U(s) + Σ_a π(s)(a) Q(s,a),   Q(s,a) = γ_r Σ_{s'} K(s,a,s') Vr(s')
 
-UniqEval(Φ): for every π there is at most one Ve with Ve = Φ π Ve.
+UniqEval(Φ): for every π there is at most one Ve ∈ D with Ve = Φ π Ve.
 Local(Φ, ρ): (Φ π v)(h,g,s) depends on π only through π(s) and on v only through states of rank < ρ(s).
 Instances: linear Φ (paper's (6)); power-mean Φ ((6'), later batch); Ψ from (7)–(8).
 Simplifications: state-independent action set, one goal set for all humans.
@@ -45,6 +52,9 @@ i.e. x = c' + γ_r M(x) as in §3 with c' = γ_r K c.
   there is at most one solution, for all real β, γ_r.
 - **SYS-L (linear instance).** Φ π v h g s = Σ_a π(s)(a)[r(h,g,s,a) + γ_h Σ_{s'} Kh(h,g,s,a,s') v(h,g,s')]
   with Kh ≥ 0, row sums ≤ 1: UniqEval if γ_h ∈ [0,1); Local(Φ, ρ) if Kh respects ρ.
+- **SYS-T (trajectory instance).** G = {*}, D = {v > 0}, Φ π v h s = 1 + Σ_{s'} M_π(h,s,s') v(h,s') with
+  M_π ≥ 0 arbitrary: UniqEval holds, with no row-sum or discount hypothesis (BEL-1 with c = 1, γ = 1).
+  So for (7T), SYS-1 and SYS-2 hold unconditionally.
 - **SYS-P (?)** UniqEval for the power-mean Φ of (6') in cyclic games with κ, θ < 1.  (Power means of
   order < 1 are not sup-norm nonexpansive; rewards may vanish, so BEL-1 does not apply directly.)
 - **SYS-4 (?)** Existence of a solution (positivity conditions on the data; paper: ε-regularisation).
