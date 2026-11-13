@@ -10,7 +10,7 @@
 - Departures: (a) numerical experiments (`numerics/`) are exploratory evidence outside the
   protocol and are labelled N; (b) informal results (I) are research notes, not completion claims.
   Protocol chosen by the agent on the owner's instruction "a suitable protocol" + "Lean workflow";
-  owner may override.
+  owner confirmed Protocol E on 2026-11-13.
 
 ## Mathematical target
 

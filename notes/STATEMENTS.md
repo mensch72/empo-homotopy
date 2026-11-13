@@ -3,41 +3,51 @@
 Status marks: **L** = proved in Lean (name given), **I** = informal proof only, **N** = numerical
 evidence only, **?** = open.  Nothing marked I/N/? may be reported as verified.
 
-## 0. Target system (owner decision 2026-11-13: the paper's version)
+## 0. Target system (owner decisions 2026-11-13)
 
-Source: arXiv:2508.00159v2, Table 2 (`tab:equations`), eqs. (4)–(9), read from the LaTeX source.
-Phase 1 (human side, eqs. (1)–(3)) yields π_h independently of π_r; it is treated as exogenous here.
+Robot side as in arXiv:2508.00159v2 Table 2, eqs. (4), (5), (7)–(9) (read from the LaTeX source);
+human value equation (6) replaced by eq. (5) of the proposal PDF (power means, κ, θ ≤ 1).
+Phase 1 (human policies π_h) is exogenous.
 
-    (4) Q_r(s,a)    = γ_r E_g E_{a_H∼π_H(s,g)} E_{s'} V_r(s')
-    (5) π_r(s)(a)   ∝ (−Q_r(s,a))^(−β_r)
-    (6) V^e_h(s,g_h) = E_{g_-h} E_{a_H∼π_H(s,g)} E_{a_r∼π_r(s)} E_{s'} (U_h(s',g_h) + γ_h V^e_h(s',g_h))
-    (7) X_h(s)      = Σ_{g_h} V^e_h(s,g_h)^ζ
-    (8) U_r(s)      = −(Σ_h X_h(s)^(−ξ))^η
-    (9) V_r(s)      = U_r(s) + E_{a_r∼π_r(s)} Q_r(s,a_r)
+    (4)  Q_r(s,a)   = γ_r E_g E_{a_H∼π_H(s,g)} E_{s'} V_r(s')
+    (5)  π_r(s)(a)  ∝ (−Q_r(s,a))^(−β)
+    (6') V_h(s,g)   = E_{a_h∼π_h(s,g)} ( E_{a_-h} ( E_{a_r∼π_r(s)} (E_{s'} Y)^κ )^(θ/κ) )^(1/θ),
+                      Y = U_h(s',g) + γ_h V_h(s',g)        [κ = θ = 1: the paper's linear (6)]
+    (7)  X_h(s)     = Σ_g V_h(s,g)^ζ
+    (8)  U_r(s)     = −(Σ_h X_h(s)^(−ξ))^η     [proposal: −(1/ξ)(E_h (E_g V^ζ)^(−ξ))^η; same π_r for
+                                                 uniform weights, since π_r is invariant under scaling U_r]
+    (9)  V_r(s)     = U_r(s) + E_{a_r∼π_r(s)} Q_r(s,a_r)
 
-Abstract form used for all statements (finite S, A nonempty, H, G; real parameters):
-kernels K(s,a,s') ≥ 0 and Kh(h,g,s,a,s') ≥ 0 with row sums ≤ 1 (the human and goal expectations
-are folded into the kernels), rewards r(h,g,s,a) ≥ 0 (= E_{s'} U_h(s',g)).  A **solution** is
-(π, Q, Ve, Vr) with, for all s, a, h, g:
+Bracketing of (6') is reading R1 of the PDF (owner has not objected).
+
+**Abstract form** (finite S, A nonempty, H, G; K(s,a,s') ≥ 0 with row sums ≤ 1; real β, γ_r):
+an evaluation operator Φ (π, v) ↦ Φ π v ∈ ℝ^{H×G×S} and an aggregation Ψ_s : ℝ^{H×G} → ℝ.
+A **solution** is (π, Q, Ve, Vr) with, for all s, a:
 
     π(s) ∈ Δ(A),  Q(s,a) < 0,  π(s)(a) = (−Q(s,a))^(−β) / Σ_b (−Q(s,b))^(−β)
-    Ve(h,g,s) = Σ_a π(s)(a) [ r(h,g,s,a) + γ_h Σ_{s'} Kh(h,g,s,a,s') Ve(h,g,s') ],  Ve ≥ 0
-    X(h,s) := Σ_g Ve(h,g,s)^ζ > 0,   U(s) := −(Σ_h X(h,s)^(−ξ))^η
+    Ve = Φ π Ve,   U(s) := Ψ_s(Ve(·,·,s)) < 0
     Vr(s) = U(s) + Σ_a π(s)(a) Q(s,a),   Q(s,a) = γ_r Σ_{s'} K(s,a,s') Vr(s')
 
-Simplifications relative to the paper: state-independent action set and one goal set G for all
-humans; H nonempty.  The proposal's Table 1 differs (U_r(s) inside Q_r(s,a); extra exponents κ, θ):
-§1 and §4 below concern that variant only and are **not** about the target system (finding F1).
+UniqEval(Φ): for every π there is at most one Ve with Ve = Φ π Ve.
+Local(Φ, ρ): (Φ π v)(h,g,s) depends on π only through π(s) and on v only through states of rank < ρ(s).
+Instances: linear Φ (paper's (6)); power-mean Φ ((6'), later batch); Ψ from (7)–(8).
+Simplifications: state-independent action set, one goal set for all humans.
+§1 and §4 below concern the proposal's variant of eq. (2) (U_r(s) inside Q_r(s,a)) and are **not**
+about the target system (finding F1).
 
 With x = −Q, c = −U > 0:  x(s,a) = γ_r Σ_{s'} K(s,a,s') [ c(s') + w_β(x(s',·)) ]  (w_β: §2),
 i.e. x = c' + γ_r M(x) as in §3 with c' = γ_r K c.
 
 - **SYS-1 (robot side determined by U for β ≤ 1).** Let β ∈ [0,1].  Two solutions with the same
-  U have the same Q, π and Vr.  If moreover γ_h ∈ [0,1), they have the same Ve.
-- **SYS-2 (β = 0).** If β = 0 and γ_h, γ_r ∈ [0,1), there is at most one solution.
-- **SYS-3 (acyclic).** If there is ρ : S → ℕ with ρ(s') < ρ(s) whenever K(s,a,s') > 0 or
-  Kh(h,g,s,a,s') > 0, there is at most one solution, for all real β, γ_r, γ_h, ζ, ξ, η.
-- **SYS-4 (?)** Existence of a solution (needs positivity conditions on the data; paper: ε-regularisation).
+  U have the same Q, π and Vr; under UniqEval(Φ) also the same Ve.
+- **SYS-2 (β = 0).** If β = 0, γ_r ∈ [0,1) and UniqEval(Φ), there is at most one solution.
+- **SYS-3 (acyclic).** If ρ : S → ℕ satisfies ρ(s') < ρ(s) whenever K(s,a,s') > 0, and Local(Φ, ρ),
+  there is at most one solution, for all real β, γ_r.
+- **SYS-L (linear instance).** Φ π v h g s = Σ_a π(s)(a)[r(h,g,s,a) + γ_h Σ_{s'} Kh(h,g,s,a,s') v(h,g,s')]
+  with Kh ≥ 0, row sums ≤ 1: UniqEval if γ_h ∈ [0,1); Local(Φ, ρ) if Kh respects ρ.
+- **SYS-P (?)** UniqEval for the power-mean Φ of (6') in cyclic games with κ, θ < 1.  (Power means of
+  order < 1 are not sup-norm nonexpansive; rewards may vanish, so BEL-1 does not apply directly.)
+- **SYS-4 (?)** Existence of a solution (positivity conditions on the data; paper: ε-regularisation).
 - **SYS-5 (?)** Is the solution unique in cyclic games for β ≤ 1?  For which β can it be non-unique?
 - Remark (**I**): π_r is invariant under scaling Q_r, so γ_r → 0 is not trivial: with x̃ = x/γ_r,
   x̃ = K(c + γ_r w_β(x̃)); at γ_r = 0, π_r(s) ∝ (Σ_{s'}K(s,a,s') c(s'))^(−β) still feeds back through c.
