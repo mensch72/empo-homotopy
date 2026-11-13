@@ -17,6 +17,16 @@ Unknown: robot policy π_r(s) ∈ Δ(A_r).  Exogenous: human policies π_h(s,g),
 
 Reading R1 (bracketing of (5)) and R2 (the first term of (2) is U_r(s), at the *current* state,
 hence independent of a) are taken from the PDF as printed; both are flagged for the owner.
+**Finding F1 (2026-11-13, from arXiv:2508.00159v2 Table 1, eqs. 4, 5, 9; read by a fetch agent,
+not yet re-read by a second reader).**  The paper has Q_r(s,a) = γ_r E_{s'} V_r(s'),
+V_r(s) = U_r(s) + E_{a∼π_r(s)} Q_r(s,a), i.e. Q_r(s,a) = γ_r E_{s'}[U_r(s') + E_{a'}Q_r(s',a')]
+(reading R2').  Under R2' the term U_r(s) does not enter π_r(s), acyclic games have a unique
+solution by plain backward induction (as the paper states), and §1 and §4 below are vacuous;
+they matter only under R2 (the proposal as printed).  §2 and §3 hold under both readings
+(under R2': c = γ_r T̄(−U_r) > 0 needs γ_r > 0 and is the same equation x = c + γ M(x)).
+The paper's (6)–(8) also have no κ, θ and no log (U_r = −(Σ_h X_h^(−ξ))^η, X_h = Σ_g V^ζ).
+Owner to decide which system is the target.
+
 Standing assumption P: V_h(s,g) > 0 wherever it enters (4) (else U_r = −∞).
 
 Consequence of R2: Q_r(s,·) depends on a only through the continuation term, while U_r(s) depends

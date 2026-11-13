@@ -57,3 +57,9 @@ List the declared foundations separately. Compare the complete transitive axiom 
 - Closure decision, responsible reviewer or author, scope and bound evidence:
 
 Keep the manifest's own hash in an external record if needed; do not create a self-hashing cycle. For a non-release change, explain any deferred release-only duties.
+
+## Findings (project entries)
+
+| ID | Date | Affected | Finding | Status |
+| --- | --- | --- | --- | --- |
+| F1 | 2026-11-13 | STATEMENTS §0 (R2), LOC-1..4, §4 | Proposal Table 1 eq. (2) puts U_r(s) at the current state; arXiv:2508.00159v2 eqs. 4/9 give Q_r(s,a) = γ_r E[U_r(s') + E Q_r(s',a')]. Under the paper's form the local problem (LOC) is vacuous and acyclic games are uniquely solvable. LEH and BEL unaffected. | Open: owner decision on target system; source to be re-read by a second reader |
