@@ -456,4 +456,107 @@ theorem sys_paper_psi_neg {S H G : Type*} [Fintype H] [Fintype G] [Nonempty H] (
   refine neg_neg_of_pos (Real.rpow_pos_of_pos ?_ _)
   exact Finset.sum_pos (fun h _ => Real.rpow_pos_of_pos (hw h) _) univ_nonempty
 
+/-- The trajectory aggregation (eq. (8) with `X_h` from (7T)), goal set `Unit`:
+`Ψ s w = −(∑_h w(h,*)^(−ξ))^η`. -/
+def trajΨ {S H : Type*} [Fintype H] (ξ η : ℝ) (_s : S) (w : H → Unit → ℝ) : ℝ :=
+  -(∑ h, w h () ^ (-ξ)) ^ η
+
+/-! ## Non-vacuity witnesses (SYS-W) -/
+
+/-- Kernel of the acyclic witness: state `0` moves to state `1` under both actions;
+state `1` is terminal. -/
+def wK3 : Fin 2 → Fin 2 → Fin 2 → ℝ := fun s _ s' => if s = 0 ∧ s' = 1 then 1 else 0
+
+/-- Acyclic witness data: `S = A = Fin 2`, `H = G = Unit`, linear `Φ` with reward `1`,
+`γ_h = 1`, `Kh = K`; `Ψ = paperΨ 1 1 1`; `β = 1`, `γ_r = 1/2`, admissible set `univ`. -/
+def wD3 : SysData (Fin 2) (Fin 2) Unit Unit where
+  K := wK3
+  Φ := linearΦ (fun _ _ _ _ => 1) 1 (fun _ _ => wK3)
+  Ψ := paperΨ 1 1 1
+  β := 1
+  γr := 1 / 2
+  adm := Set.univ
+  K_nonneg := by intro s a s'; unfold wK3; split_ifs <;> norm_num
+  K_sum_le := by intro s a; fin_cases s <;> simp [wK3]
+
+lemma wK3_rank (s a s' : Fin 2) (h : 0 < wK3 s a s') :
+    (fun s : Fin 2 => if s = 0 then 1 else 0) s' < (fun s : Fin 2 => if s = 0 then 1 else 0) s := by
+  fin_cases s <;> fin_cases s' <;> simp [wK3] at h ⊢
+
+/-- **SYS-W (acyclic).**  There is an instance with `S = Fin 2` (state `0 → 1`, state `1`
+terminal, state `0` not terminal), a rank `ρ` with `K(s,a,s') > 0 ⇒ ρ(s') < ρ(s)`, a linear
+evaluation `Φ` (reward `1`, `γ_h = 1`) local w.r.t. `ρ`, `Ψ = paperΨ 1 1 1`, `β = 1`,
+`γ_r = 1/2`, which has a solution; so the hypotheses of `sys3` are satisfiable. -/
+theorem sys3_nonvacuous : ∃ D : SysData (Fin 2) (Fin 2) Unit Unit, ∃ ρ : Fin 2 → ℕ,
+    (∀ s a s', 0 < D.K s a s' → ρ s' < ρ s) ∧ D.LocalEval ρ ∧ D.terminal 1 ∧ ¬ D.terminal 0 ∧
+    ∃ π Q Ve Vr, D.IsSolution π Q Ve Vr := by
+  have ht1 : wD3.terminal 1 := by intro a s'; simp [wD3, wK3]
+  have ht0 : ¬ wD3.terminal 0 := by intro h; have := h 0 1; simp [wD3, wK3] at this
+  refine ⟨wD3, fun s => if s = 0 then 1 else 0, wK3_rank, ?_, ht1, ht0,
+    fun _ _ => 1 / 2, fun s _ => if s = 0 then -1 / 2 else 0,
+    fun _ _ s => if s = 0 then 2 else 1, fun _ => -1, ?_⟩
+  · exact sys_linear_local wD3 (r := fun _ _ _ _ => 1) (γh := 1) (Kh := fun _ _ => wK3) rfl
+      (fun _ _ s a s' => wD3.K_nonneg s a s') _
+      fun _ _ s a s' h => wK3_rank s a s' h
+  constructor
+  · intro s ht a
+    fin_cases s
+    · norm_num
+    · exact absurd ht1 ht
+  · intro s ht a
+    fin_cases s
+    · norm_num [wD3, Fin.sum_univ_two, Real.rpow_neg_one]
+    · exact absurd ht1 ht
+  · intro s _ a
+    simp
+  · exact Set.mem_univ _
+  · funext h g s
+    fin_cases s <;> norm_num [wD3, linearΦ, wK3, Fin.sum_univ_two]
+  · intro s
+    fin_cases s <;> norm_num [SysData.U, wD3, paperΨ]
+  · intro s
+    fin_cases s <;> norm_num [SysData.U, wD3, paperΨ, Fin.sum_univ_two]
+  · intro s a
+    fin_cases s <;> norm_num [wD3, wK3, Fin.sum_univ_two]
+
+/-- Cyclic witness data: `S = H = G = Unit`, `A = Fin 2`, self-loop `K = 1`, linear `Φ` with
+reward `1`, `γ_h = 1/2`, `Kh = 1`; `Ψ = paperΨ 1 1 1`; `β = 0`, `γ_r = 1/2`, admissible set
+`univ`. -/
+def wD1 : SysData Unit (Fin 2) Unit Unit where
+  K := fun _ _ _ => 1
+  Φ := linearΦ (fun _ _ _ _ => 1) (1 / 2) (fun _ _ _ _ _ => 1)
+  Ψ := paperΨ 1 1 1
+  β := 0
+  γr := 1 / 2
+  adm := Set.univ
+  K_nonneg := by intros; norm_num
+  K_sum_le := by intros; simp
+
+/-- **SYS-W (cyclic).**  There is a one-state instance with a self-loop (`K > 0`), `β = 0`
+(so `β ∈ [0,1]`), a linear evaluation `Φ` (reward `1`, `γ_h = 1/2`) with UniqEval,
+`Ψ = paperΨ 1 1 1`, `γ_r = 1/2`, which has a solution; so the hypotheses of `sys1` and
+`sys2` are satisfiable. -/
+theorem sys1_nonvacuous : ∃ D : SysData Unit (Fin 2) Unit Unit,
+    D.β = 0 ∧ 0 ≤ D.β ∧ D.β ≤ 1 ∧ D.UniqEval ∧ (∀ s a s', 0 < D.K s a s') ∧
+    ∃ π Q Ve Vr, D.IsSolution π Q Ve Vr := by
+  have hnt : ∀ s, ¬ wD1.terminal s := by intro s h; have := h 0 (); simp [wD1] at this
+  refine ⟨wD1, rfl, le_rfl, by norm_num [wD1], ?_, fun _ _ _ => by norm_num [wD1],
+    fun _ _ => 1 / 2, fun _ _ => -1 / 2, fun _ _ _ => 2, fun _ => -1, ?_⟩
+  · exact sys_linear_uniqEval wD1 (r := fun _ _ _ _ => 1) (γh := 1 / 2)
+      (Kh := fun _ _ _ _ _ => 1) rfl (by norm_num) (by norm_num) (fun _ _ _ _ _ => zero_le_one)
+      fun _ _ _ _ => by simp
+  constructor
+  · intro s _ a; norm_num
+  · intro s _ a; norm_num [wD1, Fin.sum_univ_two]
+  · intro s ht; exact absurd ht (hnt s)
+  · exact Set.mem_univ _
+  · funext h g s
+    norm_num [wD1, linearΦ, Fin.sum_univ_two]
+  · intro s
+    norm_num [SysData.U, wD1, paperΨ]
+  · intro s
+    norm_num [SysData.U, wD1, paperΨ, Fin.sum_univ_two]
+  · intro s a
+    norm_num [wD1]
+
 end EmpoHomotopy

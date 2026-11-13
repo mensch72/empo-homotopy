@@ -23,3 +23,5 @@ import EmpoHomotopy.System
 #print axioms EmpoHomotopy.sys_linear_local
 #print axioms EmpoHomotopy.sys_paper_psi_neg
 #print axioms EmpoHomotopy.sys_T_uniqEval
+#print axioms EmpoHomotopy.sys1_nonvacuous
+#print axioms EmpoHomotopy.sys3_nonvacuous
