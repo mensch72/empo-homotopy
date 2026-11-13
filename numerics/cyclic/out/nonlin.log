@@ -14,3 +14,4 @@
   Yk = Y ** k; Z = np.einsum('sa,hgsiba->hgsib', pi, Yk); Wb = Z ** (th / k)
 /home/user/empo-homotopy/numerics/cyclic/system.py:43: RuntimeWarning: invalid value encountered in power
   FV = g.gh * k * np.einsum('hgsib,sa,hgsiba,hgsibat->hgst', cB, pi, Y ** (k - 1), g.T)
+nonlin N 64 multi 8 time 301
