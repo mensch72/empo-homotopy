@@ -88,8 +88,9 @@ definition bodies and root statements against STATEMENTS §1–3, did not run Le
 | SYS-T | `sys_T_uniqEval` | faithful; concrete M_π and composition with sys1/2 not formalised |
 | Ψ instance | `sys_paper_psi_neg` | faithful; meaningful only for positive arguments |
 | SYS-6 | `sys6_two_solutions`, `sys6_three_solutions` (commit c4556d0) | faithful; instance checked field by field; reviewer's own exact-arithmetic check agrees |
+| TRJ-1..3 | `traj_exists_unique`, `trajM_rowsum_le`, `trajM_le_one`, `sys1_traj`, `sys2_traj` (commit 44feb87; one proof step repaired by the integrator) | faithful; note: M_π ≥ 0 required for all real π |
 
-Audits of the SYS roots: reviewers read definitions and statements, ran no Lean; all 22 roots in
+Audits of the SYS roots: reviewers read definitions and statements, ran no Lean; all 27 roots in
 `axioms_report.txt` depend only on propext, Classical.choice, Quot.sound.
 
 Not yet done for a Protocol E release: clean-checkout build by a reviewer, release manifest,

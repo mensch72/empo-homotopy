@@ -13,19 +13,16 @@ Paper source for the equations: `curl -L https://arxiv.org/e-print/2508.00159 | 
 ## State
 - Lean, audited (non-author statement audit passed): LOC-1..4 (proposal's variant only, not the
   target), LEH-1..3, BEL-1, BEL-2; SYS-1..3, SYS-W, SYS-L, SYS-T at commit d2dda7a (after F4 rework,
-  re-audited); SYS-6 (three solutions of a cyclic two-state game at β = 2) at c4556d0, audited.
+  re-audited); SYS-6 (three solutions of a cyclic two-state game at β = 2) at c4556d0, audited; TRJ-1..3 (trajectory form: existence/uniqueness/bounds per matrix, row sums,
+  sys1/sys2 corollaries) at 44feb87, audited.
 - Numerics: `numerics/REPORT.md` (proposal's variant); `numerics/cyclic/` (target system) in progress.
 - Not a completed Protocol E release (no clean-checkout review, manifest, manuscript).
 
 ## In flight when this was written
-Owner (11-13): main objective = something that helps solving these systems; choice of next steps left to the agent.
-1. Solver agent: Python package `solver/empo_solver/` (backward induction, finite-horizon unrolling,
-   arclength continuation in β / γ_r / γ_h, multistart, diagnostics; tests incl. the SYS-6 instance;
-   `solver/README.md`).  If lost: spec = this list + STATEMENTS §0; reuse `numerics/cyclic/system.py`.
-2. Lean author agent: `EmpoHomotopy/Trajectory.lean` — TRJ-1 (X = 1 + γ M X has exactly one solution,
-   1 ≤ X ≤ 1/(1−γm), if row sums ≤ m and γm < 1), TRJ-2 (row sums of max_{a_h} P^ζ ≤ |A_h|), TRJ-3
-   (sys1/sys2 for the trajectory form without evaluation hypothesis), TRJ-4 (is Brouwer in Mathlib?).
-3. Afterwards: non-author statement audit of Trajectory.lean; update STATEMENTS marks and ledger.
+1. Solver agent (restarted after a container restart): Python package `solver/empo_solver/` (backward
+   induction, finite-horizon unrolling, arclength continuation in β / γ_r / γ_h, multistart,
+   diagnostics; tests incl. the SYS-6 instance; `solver/README.md`).  Pushes after each step.
+   If lost: continue from the pushed files; spec = this list + STATEMENTS §0.
 
 ## Next (in order)
 - Power-mean Φ instance in Lean (definition, locality); SYS-P (is V_h unique given π_r for κ, θ < 1?).
@@ -43,3 +40,6 @@ Owner (11-13): main objective = something that helps solving these systems; choi
 - 11-13 later: SYS-6 proved in Lean (three solutions) and audited.
 - 11-13 later: owner: (7T) gets a discount γ_h; acyclicity only as an optional extra condition.
   Existence for small γ_h recorded as SYS-TE (informal).
+- 11-13/14: container restart killed two agents; files survived. Trajectory.lean finished by the
+  integrator (one simp step repaired), built, audited. Brouwer not found in Mathlib (word search).
+  Lesson: trust only `lake build`, not a silent single-file check under `timeout`.
