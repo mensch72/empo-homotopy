@@ -76,6 +76,72 @@ theorem bel1 {c : Ω → ℝ} (hc : ∀ ω, 0 < c ω) {γ : ℝ} (hγ : 0 ≤ γ
   funext fun ω => le_antisymm (bellman_le hc hγ hmono hhom hx hy hxe hye ω)
     (bellman_le hc hγ hmono hhom hy hx hye hxe ω)
 
+/-- **BEL-2 (existence).** Let `Ω` be finite, `c ∈ (0,∞)^Ω`, `0 ≤ γ < 1`, and let
+`M : (0,∞)^Ω → [0,∞)^Ω` be monotone, continuous on `(0,∞)^Ω`, and satisfy `M(x) ≤ max x`
+pointwise (stated as: `x ≤ b` pointwise implies `M x ≤ b` pointwise).  Then `x = c + γ M(x)`
+has a solution `x ∈ (0,∞)^Ω`, namely the limit of the monotone iteration from `x⁰ = c`. -/
+theorem bel2 {c : Ω → ℝ} (hc : ∀ ω, 0 < c ω) {γ : ℝ} (hγ0 : 0 ≤ γ) (hγ1 : γ < 1)
+    {M : (Ω → ℝ) → (Ω → ℝ)}
+    (hmono : ∀ x y : Ω → ℝ, (∀ ω, 0 < x ω) → (∀ ω, x ω ≤ y ω) → ∀ ω, M x ω ≤ M y ω)
+    (hnonneg : ∀ x : Ω → ℝ, (∀ ω, 0 < x ω) → ∀ ω, 0 ≤ M x ω)
+    (hmax : ∀ x : Ω → ℝ, (∀ ω, 0 < x ω) → ∀ b : ℝ, (∀ ω, x ω ≤ b) → ∀ ω, M x ω ≤ b)
+    (hcont : ContinuousOn M {x | ∀ ω, 0 < x ω}) :
+    ∃ x : Ω → ℝ, (∀ ω, 0 < x ω) ∧ x = c + γ • M x := by
+  let F : (Ω → ℝ) → (Ω → ℝ) := fun x => c + γ • M x
+  let X : ℕ → Ω → ℝ := fun k => F^[k] c
+  have hXs : ∀ k, X (k + 1) = F (X k) := fun k => Function.iterate_succ_apply' F k c
+  have hXs' : ∀ k ω, X (k + 1) ω = c ω + γ * M (X k) ω := fun k ω => by
+    rw [hXs]; rfl
+  have hge : ∀ k ω, c ω ≤ X k ω := by
+    intro k
+    induction k with
+    | zero => intro ω; exact le_rfl
+    | succ k ih =>
+      intro ω
+      rw [hXs']
+      have := hnonneg (X k) (fun ω => (hc ω).trans_le (ih ω)) ω
+      nlinarith
+  have hXpos : ∀ k ω, 0 < X k ω := fun k ω => (hc ω).trans_le (hge k ω)
+  have hmon : ∀ k ω, X k ω ≤ X (k + 1) ω := by
+    intro k
+    induction k with
+    | zero => intro ω; exact hge 1 ω
+    | succ k ih =>
+      intro ω
+      rw [hXs' (k + 1), hXs' k]
+      have := hmono _ _ (hXpos k) ih ω
+      nlinarith
+  set b := (∑ ω, c ω) / (1 - γ) with hb_def
+  have hcb : ∀ ω, c ω ≤ (1 - γ) * b := fun ω => by
+    rw [hb_def, mul_div_cancel₀ _ (by linarith : (1 - γ) ≠ 0)]
+    exact single_le_sum (fun i _ => (hc i).le) (mem_univ ω)
+  have hb : ∀ k ω, X k ω ≤ b := by
+    intro k
+    induction k with
+    | zero => intro ω; show c ω ≤ b; nlinarith [hcb ω, hc ω]
+    | succ k ih =>
+      intro ω
+      rw [hXs']
+      have := hmax _ (hXpos k) b ih ω
+      nlinarith [hcb ω]
+  have hmonoω : ∀ ω, Monotone fun k => X k ω := fun ω =>
+    monotone_nat_of_le_succ fun k => hmon k ω
+  have hbdd : ∀ ω, BddAbove (Set.range fun k => X k ω) := fun ω =>
+    ⟨b, by rintro _ ⟨k, rfl⟩; exact hb k ω⟩
+  set xs : Ω → ℝ := fun ω => ⨆ k, X k ω
+  have hlim : Filter.Tendsto X Filter.atTop (nhds xs) :=
+    tendsto_pi_nhds.2 fun ω => tendsto_atTop_ciSup (hmonoω ω) (hbdd ω)
+  have hxspos : ∀ ω, 0 < xs ω := fun ω => (hXpos 0 ω).trans_le (le_ciSup (hbdd ω) 0)
+  have hMlim : Filter.Tendsto (fun k => M (X k)) Filter.atTop (nhds (M xs)) :=
+    (hcont xs hxspos).tendsto.comp
+      (tendsto_nhdsWithin_iff.2 ⟨hlim, Filter.Eventually.of_forall fun k => hXpos k⟩)
+  have hlim2 : Filter.Tendsto (fun k => X (k + 1)) Filter.atTop (nhds (F xs)) := by
+    simp_rw [hXs]
+    exact tendsto_const_nhds.add (hMlim.const_smul γ)
+  have hlim1 : Filter.Tendsto (fun k => X (k + 1)) Filter.atTop (nhds xs) :=
+    hlim.comp (Filter.tendsto_add_atTop_nat 1)
+  exact ⟨xs, hxspos, tendsto_nhds_unique hlim1 hlim2⟩
+
 /-- The Lehmer-based robot Bellman operator on `Ω = S × A`:
 `M(x)(s,a) = ∑_{s'} T(s,a)(s') · w_β(x(s',·))`. -/
 def lehmerBellmanOp {S A : Type*} [Fintype S] [Fintype A] (β : ℝ) (T : S × A → S → ℝ)

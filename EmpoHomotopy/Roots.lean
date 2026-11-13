@@ -13,4 +13,5 @@ import EmpoHomotopy.Bellman
 #print axioms EmpoHomotopy.leh2
 #print axioms EmpoHomotopy.leh3
 #print axioms EmpoHomotopy.bel1
+#print axioms EmpoHomotopy.bel2
 #print axioms EmpoHomotopy.lehmerBellmanOp_hyps
