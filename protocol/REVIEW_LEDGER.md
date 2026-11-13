@@ -65,6 +65,7 @@ Keep the manifest's own hash in an external record if needed; do not create a se
 | F1 | 2026-11-13 | STATEMENTS §0 (R2), LOC-1..4, §4 | Proposal Table 1 eq. (2) puts U_r(s) at the current state; arXiv:2508.00159v2 eqs. 4/9 give Q_r(s,a) = γ_r E[U_r(s') + E Q_r(s',a')]. Under the paper's form the local problem (LOC) is vacuous and acyclic games are uniquely solvable. LEH and BEL unaffected. | Resolved 2026-11-13: owner chose the paper's version; equations re-read from the arXiv LaTeX source by the integrator; STATEMENTS §0 rewritten, LOC and old §4 demoted to the proposal's variant |
 | F2 | 2026-11-13 | STATEMENTS §0 | Numerics agent: eq. (2) needs a goal-marginal human policy for E_{a_H}; terminal V_h unspecified. | Open: owner to specify |
 | F3 | 2026-11-13 | LOC-4, BEL-1/2, LOC-2, LEH-1 | Statement audit: STATEMENTS.md imprecise (m > 0 needed in LOC-4; unused hypotheses). | Resolved: STATEMENTS.md aligned with the Lean roots |
+| F4 | 2026-11-13 | STATEMENTS §0 abstract form, `sys3` (commit 4068309) | Statement audit: with Q < 0 required at all states, no solution exists under the acyclicity hypothesis, so `sys3` is vacuous (reviewer proved ¬IsSolution in a scratch file). `sys1`, `sys2`, SYS-L, SYS-T faithful. | Open: terminal-state case added to §0; Lean rework and non-vacuity witnesses pending |
 
 ## Formal roots (project entries, release candidate 0.1)
 

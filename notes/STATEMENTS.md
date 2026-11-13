@@ -31,13 +31,19 @@ Bracketing of (6') is reading R1 of the PDF (owner has not objected).
 an evaluation operator Φ (π, v) ↦ Φ π v ∈ ℝ^{H×G×S} with admissible set D ⊆ ℝ^{H×G×S}, and an aggregation Ψ_s : ℝ^{H×G} → ℝ.
 A **solution** is (π, Q, Ve, Vr) with, for all s, a:
 
-    π(s) ∈ Δ(A),  Q(s,a) < 0,  π(s)(a) = (−Q(s,a))^(−β) / Σ_b (−Q(s,b))^(−β)
+    s non-terminal:  Q(s,a) < 0,  π(s)(a) = (−Q(s,a))^(−β) / Σ_b (−Q(s,b))^(−β)
+    s terminal:      π(s)(a) = 1/|A|   (convention; then Q(s,·) = 0 and Vr(s) = U(s))
     Ve ∈ D,  Ve = Φ π Ve,   U(s) := Ψ_s(Ve(·,·,s)) < 0
     Vr(s) = U(s) + Σ_a π(s)(a) Q(s,a),   Q(s,a) = γ_r Σ_{s'} K(s,a,s') Vr(s')
 
-UniqEval(Φ): for every π there is at most one Ve ∈ D with Ve = Φ π Ve.
+s is **terminal** iff K(s,a,s') = 0 for all a, s'.  (Finding F4: without the terminal case no
+solution exists in an acyclic game, since Q = 0 at a minimal-rank state.)  A solution forces
+γ_r > 0 and Σ_{s'} K(s,a,s') > 0 for every action of a non-terminal state.
+
+UniqEval(Φ): for every π there is at most one Ve ∈ D with Ve = Φ π Ve (π ranging over families of distributions).
 Local(Φ, ρ): (Φ π v)(h,g,s) depends on π only through π(s) and on v only through states of rank < ρ(s).
-Instances: linear Φ (paper's (6)); power-mean Φ ((6'), later batch); Ψ from (7)–(8).
+Instances: linear Φ (paper's (6)) with Ψ from (7)–(8) and D ⊆ {Ve > 0}; trajectory Φ (7T) with
+Ψ_s(w) = −(Σ_h w_h^(−ξ))^η and D = {v > 0}; power-mean Φ ((6'), later batch).
 Simplifications: state-independent action set, one goal set for all humans.
 §1 and §4 below concern the proposal's variant of eq. (2) (U_r(s) inside Q_r(s,a)) and are **not**
 about the target system (finding F1).
@@ -47,9 +53,11 @@ i.e. x = c' + γ_r M(x) as in §3 with c' = γ_r K c.
 
 - **SYS-1 (robot side determined by U for β ≤ 1).** Let β ∈ [0,1].  Two solutions with the same
   U have the same Q, π and Vr; under UniqEval(Φ) also the same Ve.
-- **SYS-2 (β = 0).** If β = 0, γ_r ∈ [0,1) and UniqEval(Φ), there is at most one solution.
+- **SYS-2 (β = 0).** If β = 0 and UniqEval(Φ), there is at most one solution.
 - **SYS-3 (acyclic).** If ρ : S → ℕ satisfies ρ(s') < ρ(s) whenever K(s,a,s') > 0, and Local(Φ, ρ),
   there is at most one solution, for all real β, γ_r.
+- **SYS-W (non-vacuity).** There is an acyclic instance with a terminal state (two states) satisfying
+  the hypotheses of SYS-3 that has a solution; likewise a cyclic one-state instance for SYS-1/2.
 - **SYS-L (linear instance).** Φ π v h g s = Σ_a π(s)(a)[r(h,g,s,a) + γ_h Σ_{s'} Kh(h,g,s,a,s') v(h,g,s')]
   with Kh ≥ 0, row sums ≤ 1: UniqEval if γ_h ∈ [0,1); Local(Φ, ρ) if Kh respects ρ.
 - **SYS-T (trajectory instance).** G = {*}, D = {v > 0}, Φ π v h s = 1 + Σ_{s'} M_π(h,s,s') v(h,s') with
