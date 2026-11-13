@@ -19,7 +19,7 @@ NB: `results_lin.json` was produced before the safeguarded Ve-solver edit (irrel
 ## Results (N = instances searched in the compute budget; "multi" = >=2 distinct verified solutions at some grid beta)
 | mode | N | multi | smallest grid beta with multi | multi at grid beta<=1 | max #solutions | principal branch has fold |
 |---|---|---|---|---|---|---|
-| linear (kappa=theta=1) | 229 | 23 (10%) | 2 (fold interval (1.09, ...) in best case) | 0 | 5 | 6 (min fold beta 1.09) |
+| linear (kappa=theta=1) | 229 | 23 (10%) | 2 | 0 | 5 | 6 (min fold beta 1.09) |
 | power-mean (kappa,theta<1) | 74 | 9 (12%) | 8 | 0 | 3 | 3 (min fold 2.33) |
 | trajectory (variant 3) | 168 | 53 (32%) | 1 (instance 61: window ~(0.92,1.23)) | 1 | 9 | 12 (min fold 1.00) |
 * No instance had multiplicity at beta=0 or 0.5. Linear: none at beta<=1 in 229 tries (best fold beta = 1.09, instance 184; 1.14 for instance 168). Not found != does not exist: N is small and the
@@ -34,16 +34,16 @@ NB: `results_lin.json` was produced before the safeguarded Ve-solver edit (irrel
 ## Simplest multi-solution instance (linear, `out/simplest_lin.json`, instance 168; verified by `verify()` with separate loops and plain iteration)
 S=2, A=3, H=G=1, B=1, A_h=2, deterministic: state 0 absorbing under all a; state 1: a0,a1 -> 0, a2 -> 1 (self-loop). p(1)=((.58148,.41852),(.65845,.34155)) over a_h at s=0,1;
 u = (0.05, 1.02066) (eps incl.); zeta=1.58597, xi=1.52669, eta=2.55845, gamma_h=0.651255, gamma_r=0.823649. At beta=2 three solutions, x(s0,.)=784971.65645 (uniform pi) and x(s1,.)=
-(784971.65645, 784971.65645, v): v = 547265.708 (pi(s1,a2)=0.50707), 99279.910 (0.96900), 0.00603 (pi=1-1e-8-ish); residuals <= 7e-15 (relative), Q<0, Ve>=0.14, X>=0.046, pairwise max|dz| >= 1.7.
+(784971.65645, 784971.65645, v): v = 547265.708 (pi(s1,a2)=0.50707), 99279.910 (0.96900), 0.00603; residuals <= 7e-15 (relative), Q<0, Ve>=0.14, X>=0.046, pairwise max|dz| >= 1.7.
 Multiplicity for beta in about (1.14, 2.90) (folds 1.1434, 2.8953; beta=1.25..2.75 on a 0.25 grid). Caveat: conditioning is extreme (c ~ 8e5 since X is small); the 3rd solution is almost deterministic.
 Nonlinear simplest (instance 47, S=2,A=2,H=1,G=2, beta=35, three solutions, x of order 2..14, `out/trace_nonlin.txt`, `out/simplest_nonlin.json`): well conditioned.
 
 ## Tracers (`out/curve_*.png`, `out/trace_*.txt`)
 * beta from 0 (linear, instance 168): warm Newton K=10 stalls at beta=2.48, K=80 at 2.89 (the fold); arclength passes both folds (path forward-back-forward) and reaches beta=50.
-  Nonlinear instance 47: no fold on the principal branch; warm and arclength agree and reach beta=50 -- the other two solutions are on a separate (isolated) component, found only by multistart.
+  Nonlinear instance 47: no fold on the principal branch; warm and arclength agree and reach beta=50; the other solutions were found only by multistart (isolated components not checked).
   Traj instance 61: arclength/warm both stop at beta~1.234 (fold; ds collapsed, not resolved).
 * gamma_r from 0.02 at fixed beta (multistart: 1 solution at 0.02 in linear and traj, 3 in nonlinear): arclength and warm (K=10, 80) all end at the SAME solution; linear: the near-deterministic one
-  (pi(s1,a2)=1), NOT the near-uniform branch reached from beta=0; nonlinear: pi=0.788 (index 0); traj: the third (pi=0.008).
+  (pi(s1,a2)=1), not the near-uniform branch reached from beta=0; nonlinear: pi=0.788 (index 0); traj: the third (pi=0.008).
 ## Caveats
 Small N (random search, one distribution); grid beta coarse; wall budgets were not equal (linear 292 s, nonlinear 454 s (slow Ve), traj 153 s); instances with tiny/huge x are numerically harsh; "simplest" = smallest S*A*H*G.
 Ambiguities in s0: with the original linear Ve the fixed-point of Ve needs gamma_h < 1 or absorbing terminals (F4); K for the robot is not defined by s0 (here: average of T); the human policy p was fixed random.
