@@ -45,14 +45,19 @@ def _F(g, pi, V, deriv=False):
 
 
 def solve_ve(g, pi, V0=None, fp=8, tol=1e-14):
-    """Fixed-point iterations from V0 (default 0) then Newton; counts non-convergence in Game.ncv."""
+    """Fixed-point iterations from V0 (default 0), safeguarded Newton, else plain iteration; counts non-convergence in Game.ncv."""
     V = np.zeros(g.u.shape) if V0 is None else V0.copy(); n = g.u.shape[2]
     for _ in range(fp): V = _F(g, pi, V)
+    Vw = V.copy()
     for _ in range(30):
         F, _, FV = _F(g, pi, V, True); R = V - F
+        if not np.all(np.isfinite(R)): break
         if np.abs(R).max() < tol: return V
-        D = np.linalg.solve(np.eye(n) - FV, R[..., None])[..., 0]; V = V - D
-    for _ in range(5000):
+        try: V = V - np.linalg.solve(np.eye(n) - FV, R[..., None])[..., 0]
+        except np.linalg.LinAlgError: break
+        if np.any(V <= 0) or not np.all(np.isfinite(V)): break
+    V = Vw
+    for _ in range(20000):
         V = _F(g, pi, V)
         if np.abs(V - _F(g, pi, V)).max() < 1e-12: return V
     Game.ncv += 1; return V
@@ -60,6 +65,7 @@ def solve_ve(g, pi, V0=None, fp=8, tol=1e-14):
 
 def human(g, pi, jac=False):
     """pi (S,A) -> Ve (H,G,S), X (H,S), c = -U (S,) [and dc/dpi as (S, S*A)]."""
+    if hasattr(g, "human"): return g.human(pi, jac)
     S, A, H, G = g.dims
     Ve = solve_ve(g, pi)
     X = (np.maximum(Ve, 0) ** g.zeta).sum(1)
@@ -147,6 +153,7 @@ def phi_jac_rho(g, z, beta):
 
 
 def verify(g, z, beta):
+    if hasattr(g, "verify3"): return g.verify3(z, beta)
     """Independent check (loops, plain iteration to 1e-15) of all solution conditions of s0 for pi, Q = -x."""
     S, A, H, G = g.dims; Ai, B = g.T.shape[3], g.T.shape[4]; x = np.exp(z).reshape(S, A); Q = -x
     pi = x ** -beta; pi /= pi.sum(1, keepdims=True)

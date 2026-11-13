@@ -1,17 +1,5 @@
-/home/user/empo-homotopy/numerics/cyclic/search.py:48: RuntimeWarning: invalid value encountered in subtract
-  db = (resid(g, y[:-1], y[-1] * bs + h) - R) / h * bs
-/home/user/empo-homotopy/numerics/cyclic/search.py:48: RuntimeWarning: invalid value encountered in subtract
-  z = find(gg(p0), bb(p0), np.random.default_rng(0), [])[0]   # unique at beta=0 / tiny gamma_r (checked by multistart)
-/home/user/empo-homotopy/numerics/cyclic/system.py:37: RuntimeWarning: invalid value encountered in power
-  Yk = Y ** k; Z = np.einsum('sa,hgsiba->hgsib', pi, Yk); Wb = Z ** (th / k)
-/home/user/empo-homotopy/numerics/cyclic/system.py:43: RuntimeWarning: invalid value encountered in power
-  FV = g.gh * k * np.einsum('hgsib,sa,hgsiba,hgsibat->hgst', cB, pi, Y ** (k - 1), g.T)
-/home/user/empo-homotopy/numerics/cyclic/system.py:37: RuntimeWarning: invalid value encountered in power
-  Yk = Y ** k; Z = np.einsum('sa,hgsiba->hgsib', pi, Yk); Wb = Z ** (th / k)
-/home/user/empo-homotopy/numerics/cyclic/system.py:43: RuntimeWarning: invalid value encountered in power
-  FV = g.gh * k * np.einsum('hgsib,sa,hgsiba,hgsibat->hgst', cB, pi, Y ** (k - 1), g.T)
-/home/user/empo-homotopy/numerics/cyclic/system.py:37: RuntimeWarning: invalid value encountered in power
-  Yk = Y ** k; Z = np.einsum('sa,hgsiba->hgsib', pi, Yk); Wb = Z ** (th / k)
-/home/user/empo-homotopy/numerics/cyclic/system.py:43: RuntimeWarning: invalid value encountered in power
-  FV = g.gh * k * np.einsum('hgsib,sa,hgsiba,hgsibat->hgst', cB, pi, Y ** (k - 1), g.T)
-nonlin N 64 multi 8 time 301
+/home/user/empo-homotopy/numerics/cyclic/search.py:53: RuntimeWarning: invalid value encountered in subtract
+  db = (resid(gg(p + h), y[:-1], bb(p + h)) - R) / h * ps
+/home/user/empo-homotopy/numerics/cyclic/search.py:53: RuntimeWarning: invalid value encountered in subtract
+  db = (resid(gg(p + h), y[:-1], bb(p + h)) - R) / h * ps
+nonlin N 74 multi 9 time 454

@@ -1,0 +1,13 @@
+instance i=47 (mode nonlin) dims S,A,H,G=(2, 2, 1, 2), first multiplicity grid beta=35.0, plotted coordinate pi(s1)(a1)
+nsol per beta {'0': 1, '0.5': 1, '1': 1, '2': 1, '3': 1, '5': 1, '8': 1, '12': 1, '20': 1, '35': 3, '50': 3}
+folds of principal branch []
+sol beta=35.0: x=[12.208087, 13.04417, 13.833198, 13.323116] pi(s1,a1)=0.788345 maxQ=-12 minVe=0.15 minX=0.53 simplex=0 Qres=6.7e-16 pires=6.7e-16 vefp=6.7e-16
+sol beta=35.0: x=[2.104753, 2.268699, 2.066378, 2.396709] pi(s1,a1)=0.00553855 maxQ=-2.1 minVe=0.09 minX=0.99 simplex=1.1e-16 Qres=1.1e-15 pires=1.1e-16 vefp=6.7e-16
+sol beta=35.0: x=[4.617821, 4.95475, 4.899935, 5.143705] pi(s1,a1)=0.154555 maxQ=-4.6 minVe=0.097 minX=0.85 simplex=0 Qres=1.5e-13 pires=4.2e-16 vefp=6.7e-16
+pairwise max|z-z'| = [1.901, 1.038, 0.863]
+warm beta-steps K=10: converged 10/10 steps, last ok beta=50.4
+warm beta-steps K=80: converged 80/80 steps, last ok beta=50.4
+gamma_r=0.02, beta=35.0: multistart finds 3 solution(s)
+gamma_r arclength (folds [], reached gamma_r=0.963), Newton polish at target: res 1.3e-15, sol index 0 of 3 (pi=0.7883); all pi: [np.float64(0.7883), np.float64(0.0055), np.float64(0.1546)]
+gamma_r warm K=10: reached target=True, sol index 0 (pi=0.7883)
+gamma_r warm K=80: reached target=True, sol index 0 (pi=0.7883)

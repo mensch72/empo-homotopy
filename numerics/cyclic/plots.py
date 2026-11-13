@@ -3,11 +3,12 @@ import sys, json, numpy as np
 from dataclasses import replace
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 from system import *
+from traj import Game3
 from search import find, trace, BETAS
 
 mode = sys.argv[1]
 R = json.load(open(f'out/results_{mode}.json')); multi = [r for r in R if 'game' in r]
-r = min(multi, key=lambda r: (r['size'], r['i'])); g = Game.fromdict(r['game']); S, A = g.dims[:2]
+r = min(multi, key=lambda r: (r['size'], r['i'])); g = (Game3 if mode == 'traj' else Game).fromdict(r['game']); S, A = g.dims[:2]
 bm = min(float(b) for b, n in r['n'].items() if n >= 2); sols = [np.array(z) for z in r['sols'][str(bm if bm != int(bm) else int(bm))]]
 pis = np.array([softmax_pi(g, z, bm) for z in sols]); sp = pis.max(0) - pis.min(0); s0, a0 = np.unravel_index(sp.argmax(), sp.shape)
 coord = lambda z, b: softmax_pi(g, z, b)[s0, a0]

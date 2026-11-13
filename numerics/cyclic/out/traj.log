@@ -1,0 +1,41 @@
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+                    ~~~~^^^^^^^^^^^^^^^
+  File "/home/user/empo-homotopy/numerics/cyclic/search.py", line 96, in run_instance
+    sols[b] = find(g, b, rng, prev if b else []); prev = sols[b]
+              ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/empo-homotopy/numerics/cyclic/search.py", line 35, in find
+    for z in starts(g, beta, rng, prev):
+             ~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/empo-homotopy/numerics/cyclic/search.py", line 27, in starts
+    for _ in range(6): pi = 0.5 * pi + 0.5 * phi(g, pi, beta, None)[0]
+                                             ~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/user/empo-homotopy/numerics/cyclic/system.py", line 139, in phi
+    c = human(g, pi)[2]; x = x_given_c(g, c, beta, x0)
+        ~~~~~^^^^^^^
+  File "/home/user/empo-homotopy/numerics/cyclic/system.py", line 68, in human
+    if hasattr(g, "human"): return g.human(pi, jac)
+                                   ~~~~~~~^^^^^^^^^
+  File "/home/user/empo-homotopy/numerics/cyclic/traj.py", line 27, in human
+    if max(np.abs(np.linalg.eigvals(M)).max(axis=-1) if M.ndim == 3 else [0]) >= 1:
+                  ~~~~~~~~~~~~~~~~~^^^
+  File "/usr/local/lib/python3.13/site-packages/numpy/linalg/_linalg.py", line 1253, in eigvals
+    _assert_finite(a)
+    ~~~~~~~~~~~~~~^^^
+  File "/usr/local/lib/python3.13/site-packages/numpy/linalg/_linalg.py", line 263, in _assert_finite
+    raise LinAlgError("Array must not contain infs or NaNs")
+numpy.linalg.LinAlgError: Array must not contain infs or NaNs
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/user/empo-homotopy/numerics/cyclic/search.py", line 115, in <module>
+    for r in P.imap(run_instance, [(i, seed, mode) for i in range(N)]):
+             ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/multiprocessing/pool.py", line 873, in next
+    raise value
+numpy.linalg.LinAlgError: Array must not contain infs or NaNs

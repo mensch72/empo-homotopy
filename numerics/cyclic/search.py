@@ -5,6 +5,7 @@ from multiprocessing import Pool
 from system import *
 from system import _F
 from gen import rand_game
+from traj import Game3, rand_game3
 
 BETAS = [0, 0.5, 1, 2, 3, 5, 8, 12, 20, 35, 50]
 NST = 30
@@ -45,7 +46,9 @@ def trace(g, pend=50.0, mode='beta', p0=0.0, beta0=0.0, maxsteps=600, ps=10.0):
     n = g.dims[0] * g.dims[1]
     gg = lambda p: g if mode == 'beta' else replace(g, gr=p)
     bb = lambda p: p if mode == 'beta' else beta0
-    z = find(gg(p0), bb(p0), np.random.default_rng(0), [])[0]   # unique at beta=0 / tiny gamma_r (checked by multistart)
+    z0s = find(gg(p0), bb(p0), np.random.default_rng(0), [])
+    if not z0s: return np.array([p0]), np.zeros((1, n)), []
+    z = z0s[0]   # unique at beta=0 / tiny gamma_r (checked by multistart)
     y = np.append(z, p0 / ps); tprev = np.zeros(n + 1); tprev[-1] = 1
     def Jfull(y):
         p = y[-1] * ps; R, J = resid(gg(p), y[:-1], bb(p), True); h = 1e-6
@@ -88,8 +91,8 @@ def ve_diag(g, pi):
 
 
 def run_instance(args):
-    i, seed, nonlin = args
-    rng = np.random.default_rng(seed * 100003 + i); g = rand_game(rng, nonlin); Game.ncv = 0
+    i, seed, mode = args; nonlin = mode == 'nonlin'
+    rng = np.random.default_rng(seed * 100003 + i); g = rand_game3(rng) if mode == 'traj' else rand_game(rng, nonlin); Game.ncv = 0; Game3.rho_fail = Game3.nev = 0
     S, A = g.dims[:2]; sols, prev = {}, []
     for b in BETAS:
         sols[b] = find(g, b, rng, prev if b else []); prev = sols[b]
@@ -101,17 +104,17 @@ def run_instance(args):
         k = np.argmin(np.abs(B - b)); match[b] = bool(len(sols[b]) and np.min([np.abs(Z[k] - z).max() for z in sols[b]]) < 1e-3 and abs(B[k] - b) < 0.5)
     diag = [ve_diag(g, softmax_pi(g, z, 5.0)) for z in sols[5][:2]] if nonlin else []
     r = dict(i=i, size=S * A * g.dims[2] * g.dims[3], dims=g.dims, n={b: len(sols[b]) for b in BETAS}, rho={b: float(rho[b]) for b in BETAS},
-             folds=folds, bmax_traced=float(B.max()), ncv=Game.ncv, vediag_bad=sum(1 for d in diag if (not d[0]) or d[1] > 1e-7), vediag_n=len(diag))
+             folds=folds, bmax_traced=float(B.max()), ncv=Game.ncv, rho_fail=Game3.rho_fail, nev=Game3.nev, vediag_bad=sum(1 for d in diag if (not d[0]) or d[1] > 1e-7), vediag_n=len(diag))
     if max(r['n'].values()) >= 2:
         r['game'] = g.todict(); r['sols'] = {str(b): [z.tolist() for z in sols[b]] for b in BETAS}
     return r
 
 
 if __name__ == '__main__':
-    mode, N, seed, budget = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[4]); nl = mode == 'nonlin'
+    mode, N, seed, budget = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), float(sys.argv[4]); 
     t0 = time.time(); res = []
     with Pool(4) as P:
-        for r in P.imap(run_instance, [(i, seed, nl) for i in range(N)]):
+        for r in P.imap(run_instance, [(i, seed, mode) for i in range(N)]):
             res.append(r)
             if time.time() - t0 > budget: P.terminate(); break
     json.dump(res, open(f'out/results_{mode}.json', 'w'))
